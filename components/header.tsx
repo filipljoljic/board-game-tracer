@@ -13,6 +13,7 @@ export default function Header() {
             <Link href="/" className="hover:text-primary">Groups</Link>
             <Link href="/games" className="hover:text-primary">Games</Link>
             <Link href="/users" className="hover:text-primary">Users</Link>
+            <Link href="/statistics" className="hover:text-primary">Statistics</Link>
           </nav>
         </div>
         <div>
