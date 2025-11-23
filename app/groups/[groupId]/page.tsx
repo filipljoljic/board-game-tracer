@@ -3,6 +3,8 @@ import LeaderboardTable from '@/components/leaderboard-table'
 import Link from 'next/link'
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
+import { GroupMembers } from '@/components/group-members'
+import { GroupHistory } from '@/components/group-history'
 
 export default async function GroupPage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params
@@ -10,6 +12,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   const group = await prisma.group.findUnique({ where: { id: groupId } })
   if (!group) notFound()
 
+  // Leaderboard Data
   const aggregation = await prisma.sessionPlayer.groupBy({
     by: ['userId'],
     where: { session: { groupId } },
@@ -34,16 +37,60 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
     })
     .sort((a, b) => b.totalLeaguePoints - a.totalLeaguePoints)
 
+  // Members Data
+  const members = await prisma.groupMember.findMany({
+    where: { groupId },
+    include: { user: true }
+  })
+  const memberUsers = members.map(m => m.user)
+  const allUsers = await prisma.user.findMany({ orderBy: { name: 'asc' } })
+
+  // History Data
+  const sessions = await prisma.session.findMany({
+    where: { groupId },
+    orderBy: { playedAt: 'desc' },
+    include: {
+        game: true,
+        players: {
+            include: { user: true },
+            orderBy: { placement: 'asc' }
+        }
+    }
+  })
+
+  const history = sessions.map(session => {
+    const winners = session.players.filter(p => p.placement === 1).map(p => p.user.name)
+    return {
+        id: session.id,
+        gameName: session.game.name,
+        playedAt: session.playedAt,
+        winnerNames: winners
+    }
+  })
+
   return (
-    <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">{group.name} Leaderboard</h1>
-        <Link href="/sessions/new">
-          <Button>Record Session</Button>
-        </Link>
+    <div className="container mx-auto py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-2 space-y-8">
+        <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold">{group.name}</h1>
+            <Link href="/sessions/new">
+                <Button>Record Session</Button>
+            </Link>
+        </div>
+        
+        <section>
+            <h2 className="text-xl font-semibold mb-4">Leaderboard</h2>
+            <LeaderboardTable data={leaderboard} />
+        </section>
+
+        <section>
+             <GroupHistory sessions={history} />
+        </section>
       </div>
-      <LeaderboardTable data={leaderboard} />
+
+      <div className="space-y-8">
+        <GroupMembers groupId={group.id} members={memberUsers} allUsers={allUsers} />
+      </div>
     </div>
   )
 }
-

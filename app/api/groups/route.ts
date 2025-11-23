@@ -11,3 +11,22 @@ export async function GET() {
   }
 }
 
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    const { name } = body
+
+    if (!name) {
+      return NextResponse.json({ error: 'Name is required' }, { status: 400 })
+    }
+
+    const group = await prisma.group.create({
+      data: { name },
+    })
+    return NextResponse.json(group)
+  } catch (error) {
+    console.error('Failed to create group:', error)
+    return NextResponse.json({ error: 'Failed to create group' }, { status: 500 })
+  }
+}
+
