@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String          @id @default(cuid())
+  name      String
+  email     String?         @unique
+  isGuest   Boolean         @default(false)
+  sessions  SessionPlayer[]
+  groups    GroupMember[]
+}
+
+model Group {
+  id        String        @id @default(cuid())
+  name      String
+  members   GroupMember[]
+  sessions  Session[]
+}
+
+model GroupMember {
+  id      String @id @default(cuid())
+  groupId String
+  userId  String
+  role    String // "ADMIN" | "MEMBER"
+
+  group Group @relation(fields: [groupId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
+
+model Game {
+  id        String                @id @default(cuid())
+  name      String
+  templates CustomScoreTemplate[]
+  sessions  Session[]
+}
+
+model CustomScoreTemplate {
+  id       String    @id @default(cuid())
+  gameId   String
+  name     String // e.g., "Base Game", "Expansion"
+  fields   String // e.g., [{"key": "coins", "label": "Coins", "multiplier": 1}]
+  game     Game      @relation(fields: [gameId], references: [id])
+  sessions Session[]
+}
+
+model Session {
+  id         String   @id @default(cuid())
+  gameId     String
+  templateId String?
+  groupId    String
+  playedAt   DateTime @default(now())
+  players    SessionPlayer[]
+
+  game     Game                 @relation(fields: [gameId], references: [id])
+  template CustomScoreTemplate? @relation(fields: [templateId], references: [id])
+  group    Group                @relation(fields: [groupId], references: [id])
+}
+
+model SessionPlayer {
+  id            String @id @default(cuid())
+  sessionId     String
+  userId        String
+  rawScore      Float // The actual game score
+  placement     Int // 1st, 2nd, 3rd...
+  pointsAwarded Float // League points (4, 3, 2...)
+  scoreDetails  String? // Detailed breakdown if using a template
+
+  session Session @relation(fields: [sessionId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
