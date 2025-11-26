@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "smithery-dev-filip": {
+      "type": "http",
+      "url": "https://674cc656.ngrok.smithery.ai/mcp",
+      "headers": {}
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "context7-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@smithery/cli@latest",
+        "run",
+        "@upstash/context7-mcp",
+        "--key",
+        "c93688da-519c-4d9d-b73a-d1ac05098cf7"
+      ]
+    }
+  }
+}
