@@ -41,9 +41,9 @@ export function CreateGroupDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Create Group</Button>
+        <Button data-testid="create-group-button">Create Group</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent data-testid="create-group-dialog">
         <DialogHeader>
           <DialogTitle>Create New Group</DialogTitle>
         </DialogHeader>
@@ -55,9 +55,10 @@ export function CreateGroupDialog() {
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               placeholder="Board Game Night"
+              data-testid="group-name-input"
             />
           </div>
-          <Button type="submit" className="w-full">Create</Button>
+          <Button type="submit" className="w-full" data-testid="submit-group-button">Create</Button>
         </form>
       </DialogContent>
     </Dialog>

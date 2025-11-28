@@ -41,9 +41,9 @@ export function CreateGameDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Game</Button>
+        <Button data-testid="create-game-button">Add Game</Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent data-testid="create-game-dialog">
         <DialogHeader>
           <DialogTitle>Add New Game</DialogTitle>
         </DialogHeader>
@@ -55,9 +55,10 @@ export function CreateGameDialog() {
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               placeholder="Catan, Ticket to Ride..."
+              data-testid="game-name-input"
             />
           </div>
-          <Button type="submit" className="w-full">Create</Button>
+          <Button type="submit" className="w-full" data-testid="submit-game-button">Create</Button>
         </form>
       </DialogContent>
     </Dialog>

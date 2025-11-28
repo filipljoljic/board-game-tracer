@@ -14,7 +14,7 @@ export default async function Home() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {groups.map((group) => (
-          <Link key={group.id} href={`/groups/${group.id}`}>
+          <Link key={group.id} href={`/groups/${group.id}`} data-testid="group-card">
             <Card className="hover:bg-accent transition-colors cursor-pointer">
               <CardHeader>
                 <CardTitle>{group.name}</CardTitle>

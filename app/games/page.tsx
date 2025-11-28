@@ -22,7 +22,7 @@ export default async function GamesPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {games.map((game) => (
-          <Link key={game.id} href={`/games/${game.id}`}>
+          <Link key={game.id} href={`/games/${game.id}`} data-testid="game-card">
             <Card className="hover:bg-accent/50 transition-colors cursor-pointer h-full">
               <CardHeader>
                 <CardTitle>{game.name}</CardTitle>

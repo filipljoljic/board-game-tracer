@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Alice Johnson",
+    "email": "alice@test.com",
+    "isGuest": false
+  },
+  {
+    "name": "Bob Smith",
+    "email": "bob@test.com",
+    "isGuest": false
+  },
+  {
+    "name": "Charlie Brown",
+    "email": "charlie@test.com",
+    "isGuest": false
+  },
+  {
+    "name": "Guest Player",
+    "email": null,
+    "isGuest": true
+  }
+]

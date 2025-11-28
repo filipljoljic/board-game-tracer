@@ -50,15 +50,13 @@ export default function StatisticsPage() {
     }
   }, [selectedUserId])
 
-  if (!stats && !loading) return <div className="container mx-auto py-10">Loading...</div>
-
   return (
-    <div className="container mx-auto py-10 space-y-8">
+    <main className="container mx-auto py-10 space-y-8">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Player Statistics</h1>
         <div className="w-[200px]">
           <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-            <SelectTrigger>
+            <SelectTrigger data-testid="user-select">
               <SelectValue placeholder="Select player" />
             </SelectTrigger>
             <SelectContent>
@@ -70,7 +68,25 @@ export default function StatisticsPage() {
         </div>
       </div>
 
-      {stats && (
+      {loading && (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">Loading statistics...</p>
+        </div>
+      )}
+
+      {!loading && !stats && users.length === 0 && (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">No users found. Create some users to view statistics.</p>
+        </div>
+      )}
+
+      {!loading && !stats && users.length > 0 && !selectedUserId && (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">Select a player to view their statistics.</p>
+        </div>
+      )}
+
+      {stats && !loading && (
         <>
           {/* Summary Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -147,7 +163,7 @@ export default function StatisticsPage() {
           </div>
         </>
       )}
-    </div>
+    </main>
   )
 }
 

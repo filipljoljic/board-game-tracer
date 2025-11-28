@@ -11,8 +11,16 @@ type LeaderboardEntry = {
 }
 
 export default function LeaderboardTable({ data }: { data: LeaderboardEntry[] }) {
+  if (data.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted-foreground" data-testid="leaderboard-empty">
+        <p>No sessions recorded yet. Record a session to start tracking scores!</p>
+      </div>
+    )
+  }
+
   return (
-    <Table>
+    <Table data-testid="leaderboard-table">
       <TableHeader>
         <TableRow>
           <TableHead>Rank</TableHead>
