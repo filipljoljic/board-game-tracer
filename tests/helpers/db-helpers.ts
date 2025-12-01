@@ -1,5 +1,5 @@
 import { prismaTest } from '@/lib/test-db'
-import type { User, Group, Game, Session } from '@prisma/client'
+import type { User, Group, Game, Session } from '@/lib/prisma'
 
 /**
  * Reset the entire test database by deleting all records

@@ -32,7 +32,7 @@ vi.mock('next/navigation', () => ({
 
 // Mock environment variables - set before any imports
 process.env.DATABASE_URL = 'file:./prisma/test.db'
-process.env.NODE_ENV = 'test'
+// NODE_ENV is set by vitest automatically
 
 // Cleanup after all tests
 afterAll(async () => {

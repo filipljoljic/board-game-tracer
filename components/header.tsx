@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 
 export default function Header() {
@@ -16,10 +17,18 @@ export default function Header() {
             <Link href="/statistics" className="hover:text-primary">Statistics</Link>
           </nav>
         </div>
-        <div>
-          <Link href="/sessions/new">
-            <Button size="sm">Record Session</Button>
-          </Link>
+        <div className="flex items-center gap-4">
+          <SignedIn>
+            <Link href="/sessions/new">
+              <Button size="sm">Record Session</Button>
+            </Link>
+            <UserButton afterSignOutUrl="/" />
+          </SignedIn>
+          <SignedOut>
+            <SignInButton mode="modal">
+              <Button size="sm" variant="outline">Sign In</Button>
+            </SignInButton>
+          </SignedOut>
         </div>
       </div>
     </header>
