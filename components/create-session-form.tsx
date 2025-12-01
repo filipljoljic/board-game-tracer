@@ -26,6 +26,7 @@ type PlayerScore = {
 export default function CreateSessionForm() {
   const router = useRouter()
   const [step, setStep] = useState(1)
+  const [isSaving, setIsSaving] = useState(false)
   
   // Data
   const [games, setGames] = useState<Game[]>([])
@@ -105,6 +106,9 @@ export default function CreateSessionForm() {
   }
 
   const handleSave = async () => {
+    if (isSaving) return
+    
+    setIsSaving(true)
     const payload = {
       groupId: selectedGroupId,
       gameId: selectedGameId,
@@ -113,16 +117,23 @@ export default function CreateSessionForm() {
       players: Object.values(playerScores)
     }
 
-    const res = await fetch('/api/sessions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
+    try {
+      const res = await fetch('/api/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
 
-    if (res.ok) {
-      router.push(`/groups/${selectedGroupId}`) // Redirect to leaderboard
-    } else {
+      if (res.ok) {
+        router.push(`/groups/${selectedGroupId}`) // Redirect to leaderboard
+      } else {
+        alert('Failed to save session')
+      }
+    } catch (error) {
+      console.error('Failed to save session', error)
       alert('Failed to save session')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -326,8 +337,10 @@ export default function CreateSessionForm() {
             </Table>
           </CardContent>
           <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setStep(2)}>Back</Button>
-            <Button onClick={handleSave}>Save Session</Button>
+            <Button variant="outline" onClick={() => setStep(2)} disabled={isSaving}>Back</Button>
+            <Button onClick={handleSave} disabled={isSaving}>
+              {isSaving ? 'Saving...' : 'Save Session'}
+            </Button>
           </CardFooter>
         </Card>
       )}

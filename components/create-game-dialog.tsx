@@ -15,12 +15,14 @@ import { useRouter } from 'next/navigation'
 export function CreateGameDialog() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const createGame = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || isLoading) return
 
+    setIsLoading(true)
     try {
       const res = await fetch('/api/games', {
         method: 'POST',
@@ -35,11 +37,15 @@ export function CreateGameDialog() {
       }
     } catch (error) {
       console.error('Failed to create game', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      if (!isLoading) setOpen(newOpen)
+    }}>
       <DialogTrigger asChild>
         <Button data-testid="create-game-button">Add Game</Button>
       </DialogTrigger>
@@ -56,9 +62,17 @@ export function CreateGameDialog() {
               onChange={(e) => setName(e.target.value)} 
               placeholder="Catan, Ticket to Ride..."
               data-testid="game-name-input"
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" data-testid="submit-game-button">Create</Button>
+          <Button 
+            type="submit" 
+            className="w-full" 
+            data-testid="submit-game-button"
+            disabled={isLoading || !name.trim()}
+          >
+            {isLoading ? 'Creating...' : 'Create'}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

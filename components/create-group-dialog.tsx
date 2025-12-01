@@ -15,12 +15,14 @@ import { useRouter } from 'next/navigation'
 export function CreateGroupDialog() {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const createGroup = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name.trim()) return
+    if (!name.trim() || isLoading) return
 
+    setIsLoading(true)
     try {
       const res = await fetch('/api/groups', {
         method: 'POST',
@@ -35,11 +37,15 @@ export function CreateGroupDialog() {
       }
     } catch (error) {
       console.error('Failed to create group', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      if (!isLoading) setOpen(newOpen)
+    }}>
       <DialogTrigger asChild>
         <Button data-testid="create-group-button">Create Group</Button>
       </DialogTrigger>
@@ -56,9 +62,17 @@ export function CreateGroupDialog() {
               onChange={(e) => setName(e.target.value)} 
               placeholder="Board Game Night"
               data-testid="group-name-input"
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full" data-testid="submit-group-button">Create</Button>
+          <Button 
+            type="submit" 
+            className="w-full" 
+            data-testid="submit-group-button"
+            disabled={isLoading || !name.trim()}
+          >
+            {isLoading ? 'Creating...' : 'Create'}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
