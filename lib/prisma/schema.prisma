@@ -12,13 +12,16 @@ datasource db {
 }
 
 model User {
-  id       String          @id @default(cuid())
-  clerkId  String?         @unique // Clerk user ID for authentication
-  name     String
-  email    String?         @unique
-  isGuest  Boolean         @default(false)
-  sessions SessionPlayer[]
-  groups   GroupMember[]
+  id           String          @id @default(cuid())
+  username     String          @unique
+  email        String?         @unique
+  passwordHash String
+  name         String?
+  isGuest      Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  sessions     SessionPlayer[]
+  groups       GroupMember[]
 }
 
 model Group {

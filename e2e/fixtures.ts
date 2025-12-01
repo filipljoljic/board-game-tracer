@@ -61,11 +61,15 @@ export const test = base.extend<{
       },
     });
 
-    const uniqueName = `Test User ${Date.now()}`;
+    const timestamp = Date.now();
+    const uniqueUsername = `testuser_${timestamp}`;
     const user = await prisma.user.create({
       data: {
-        name: uniqueName,
-        email: `test${Date.now()}@example.com`,
+        username: uniqueUsername,
+        name: `Test User ${timestamp}`,
+        email: `test${timestamp}@example.com`,
+        passwordHash: 'TEST_USER_PLACEHOLDER_HASH',
+        isGuest: true
       },
     });
 
@@ -131,5 +135,3 @@ export class TestHelpers {
     return `${prefix} ${Date.now()}`;
   }
 }
-
-

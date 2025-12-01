@@ -46,15 +46,33 @@ async function globalSetup() {
 
     // Create test users
     const user1 = await prisma.user.create({
-      data: { name: 'Test User 1', email: 'test1@example.com' },
+      data: { 
+        username: 'testuser1',
+        name: 'Test User 1', 
+        email: 'test1@example.com',
+        passwordHash: 'TEST_PLACEHOLDER_HASH',
+        isGuest: true
+      },
     })
 
     const user2 = await prisma.user.create({
-      data: { name: 'Test User 2', email: 'test2@example.com' },
+      data: { 
+        username: 'testuser2',
+        name: 'Test User 2', 
+        email: 'test2@example.com',
+        passwordHash: 'TEST_PLACEHOLDER_HASH',
+        isGuest: true
+      },
     })
 
     const user3 = await prisma.user.create({
-      data: { name: 'Test User 3', email: 'test3@example.com' },
+      data: { 
+        username: 'testuser3',
+        name: 'Test User 3', 
+        email: 'test3@example.com',
+        passwordHash: 'TEST_PLACEHOLDER_HASH',
+        isGuest: true
+      },
     })
 
     // Create test groups
@@ -71,7 +89,7 @@ async function globalSetup() {
       },
     })
 
-    const group2 = await prisma.group.create({
+    await prisma.group.create({
       data: {
         name: 'Weekend Warriors',
         members: {
@@ -101,7 +119,7 @@ async function globalSetup() {
       },
     })
 
-    const game2 = await prisma.game.create({
+    await prisma.game.create({
       data: {
         name: 'Ticket to Ride',
         templates: {
@@ -117,7 +135,7 @@ async function globalSetup() {
       },
     })
 
-    const game3 = await prisma.game.create({
+    await prisma.game.create({
       data: {
         name: 'Wingspan',
       },
@@ -195,5 +213,3 @@ async function globalSetup() {
 }
 
 export default globalSetup
-
-

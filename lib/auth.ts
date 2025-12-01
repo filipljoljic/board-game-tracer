@@ -1,73 +1,33 @@
-import { currentUser, auth } from '@clerk/nextjs/server'
+import { auth } from '@/auth'
 import { prisma } from '@/lib/db'
 
 export type DatabaseUser = {
   id: string
-  clerkId: string | null
-  name: string
+  username: string
+  name: string | null
   email: string | null
   isGuest: boolean
 }
 
 /**
- * Gets or creates a database user for the currently authenticated Clerk user.
- * This ensures Clerk users are synced to our database.
+ * Gets the current authenticated user from the session.
+ * Returns null if not authenticated.
  */
-export async function getOrCreateCurrentUser(): Promise<DatabaseUser | null> {
-  const { userId: clerkId } = await auth()
+export async function getCurrentUser(): Promise<DatabaseUser | null> {
+  const session = await auth()
   
-  if (!clerkId) {
+  if (!session?.user?.id) {
     return null
   }
   
-  // Try to find existing user by clerkId
-  let user = await prisma.user.findUnique({
-    where: { clerkId }
-  })
-  
-  if (user) {
-    return user
-  }
-  
-  // User doesn't exist, get Clerk user details and create
-  const clerkUser = await currentUser()
-  
-  if (!clerkUser) {
-    return null
-  }
-  
-  const email = clerkUser.emailAddresses[0]?.emailAddress || null
-  const name = clerkUser.firstName && clerkUser.lastName
-    ? `${clerkUser.firstName} ${clerkUser.lastName}`
-    : clerkUser.firstName || clerkUser.username || email?.split('@')[0] || 'User'
-  
-  // Check if a user with this email already exists (might be a guest user)
-  if (email) {
-    const existingUserByEmail = await prisma.user.findUnique({
-      where: { email }
-    })
-    
-    if (existingUserByEmail) {
-      // Link existing user to Clerk account
-      user = await prisma.user.update({
-        where: { id: existingUserByEmail.id },
-        data: { 
-          clerkId,
-          name: existingUserByEmail.name || name, // Keep existing name if set
-          isGuest: false 
-        }
-      })
-      return user
-    }
-  }
-  
-  // Create new user
-  user = await prisma.user.create({
-    data: {
-      clerkId,
-      name,
-      email,
-      isGuest: false
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      email: true,
+      isGuest: true
     }
   })
   
@@ -75,10 +35,18 @@ export async function getOrCreateCurrentUser(): Promise<DatabaseUser | null> {
 }
 
 /**
- * Gets the current authenticated Clerk user ID without creating a database user.
+ * Gets the current authenticated user ID.
+ * Returns null if not authenticated.
  */
-export async function getCurrentClerkUserId(): Promise<string | null> {
-  const { userId } = await auth()
-  return userId
+export async function getCurrentUserId(): Promise<string | null> {
+  const session = await auth()
+  return session?.user?.id || null
 }
 
+/**
+ * Checks if the current user is authenticated.
+ */
+export async function isAuthenticated(): Promise<boolean> {
+  const session = await auth()
+  return !!session?.user
+}

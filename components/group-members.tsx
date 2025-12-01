@@ -16,13 +16,18 @@ import { useRouter } from 'next/navigation'
 
 interface User {
   id: string
-  name: string
+  name: string | null
+  username: string
 }
 
 interface GroupMembersProps {
   groupId: string
   members: User[]
   allUsers: User[]
+}
+
+function getDisplayName(user: User): string {
+  return user.name || user.username
 }
 
 export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) {
@@ -103,7 +108,7 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
                 </SelectTrigger>
                 <SelectContent>
                   {availableUsers.map(user => (
-                    <SelectItem key={user.id} value={user.id}>{user.name}</SelectItem>
+                    <SelectItem key={user.id} value={user.id}>{getDisplayName(user)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -118,7 +123,7 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
         <ul className="space-y-2">
           {members.map(member => (
             <li key={member.id} className="flex justify-between items-center p-2 rounded hover:bg-accent/50 text-sm">
-              <span>{member.name}</span>
+              <span>{getDisplayName(member)}</span>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -136,4 +141,3 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
     </Card>
   )
 }
-

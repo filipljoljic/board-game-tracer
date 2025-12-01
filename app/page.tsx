@@ -1,10 +1,19 @@
 import { prisma } from '@/lib/db'
+import { auth } from '@/auth'
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { CreateGroupDialog } from '@/components/create-group-dialog'
 
 export default async function Home() {
-  const groups = await prisma.group.findMany()
+  const session = await auth()
+  
+  const groups = await prisma.group.findMany({
+    where: {
+      members: {
+        some: { userId: session?.user?.id }
+      }
+    }
+  })
 
   return (
     <div className="container mx-auto py-10">

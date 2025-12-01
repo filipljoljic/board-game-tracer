@@ -1,8 +1,15 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { auth } from '@/auth'
 
 export async function POST(request: Request) {
   try {
+    const session = await auth()
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { gameId, templateId, groupId, playedAt, players } = body
 
@@ -38,6 +45,12 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const { searchParams } = new URL(request.url)
   const groupId = searchParams.get('groupId')
 

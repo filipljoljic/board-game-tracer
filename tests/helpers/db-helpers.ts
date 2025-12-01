@@ -1,5 +1,5 @@
 import { prismaTest } from '@/lib/test-db'
-import type { User, Group, Game, Session } from '@/lib/prisma'
+import type { User, Group, Game } from '@/lib/prisma'
 
 /**
  * Reset the entire test database by deleting all records
@@ -35,9 +35,9 @@ export async function resetDatabase() {
  */
 export async function seedTestData() {
   // Create test users
-  const alice = await createTestUser({ name: 'Alice', email: 'alice@test.com' })
-  const bob = await createTestUser({ name: 'Bob', email: 'bob@test.com' })
-  const charlie = await createTestUser({ name: 'Charlie', email: 'charlie@test.com' })
+  const alice = await createTestUser({ name: 'Alice', email: 'alice@test.com', username: 'alice' })
+  const bob = await createTestUser({ name: 'Bob', email: 'bob@test.com', username: 'bob' })
+  const charlie = await createTestUser({ name: 'Charlie', email: 'charlie@test.com', username: 'charlie' })
   
   // Create test group
   const group = await createTestGroup({ name: 'Test Group' })
@@ -51,11 +51,14 @@ export async function seedTestData() {
 /**
  * Factory: Create a test user
  */
-export async function createTestUser(data: Partial<User> = {}) {
+export async function createTestUser(data: Partial<User> & { username?: string } = {}) {
+  const timestamp = Date.now()
   return await prismaTest.user.create({
     data: {
+      username: data.username || `testuser_${timestamp}`,
       name: data.name || 'Test User',
-      email: data.email || `test-${Date.now()}@example.com`,
+      email: data.email || `test-${timestamp}@example.com`,
+      passwordHash: 'TEST_PLACEHOLDER_HASH',
       isGuest: data.isGuest || false,
     },
   })
@@ -150,16 +153,15 @@ export async function createTestTemplate(data: {
  */
 export async function withTransaction<T>(fn: () => Promise<T>): Promise<T> {
   try {
-    return await prismaTest.$transaction(async (tx) => {
+    return await prismaTest.$transaction(async () => {
       const result = await fn()
       // Force rollback by throwing
       throw new Error('ROLLBACK')
     })
-  } catch (error: any) {
-    if (error.message === 'ROLLBACK') {
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'ROLLBACK') {
       return {} as T // Return empty result on intentional rollback
     }
     throw error
   }
 }
-

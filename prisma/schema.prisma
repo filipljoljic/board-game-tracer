@@ -12,20 +12,23 @@ datasource db {
 }
 
 model User {
-  id        String          @id @default(cuid())
-  clerkId   String?         @unique // Clerk user ID for authentication
-  name      String
-  email     String?         @unique
-  isGuest   Boolean         @default(false)
-  sessions  SessionPlayer[]
-  groups    GroupMember[]
+  id           String          @id @default(cuid())
+  username     String          @unique
+  email        String?         @unique
+  passwordHash String
+  name         String?
+  isGuest      Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  sessions     SessionPlayer[]
+  groups       GroupMember[]
 }
 
 model Group {
-  id        String        @id @default(cuid())
-  name      String
-  members   GroupMember[]
-  sessions  Session[]
+  id       String        @id @default(cuid())
+  name     String
+  members  GroupMember[]
+  sessions Session[]
 }
 
 model GroupMember {
@@ -55,11 +58,11 @@ model CustomScoreTemplate {
 }
 
 model Session {
-  id         String   @id @default(cuid())
+  id         String          @id @default(cuid())
   gameId     String
   templateId String?
   groupId    String
-  playedAt   DateTime @default(now())
+  playedAt   DateTime        @default(now())
   players    SessionPlayer[]
 
   game     Game                 @relation(fields: [gameId], references: [id])
@@ -68,7 +71,7 @@ model Session {
 }
 
 model SessionPlayer {
-  id            String @id @default(cuid())
+  id            String  @id @default(cuid())
   sessionId     String
   userId        String
   rawScore      Float // The actual game score

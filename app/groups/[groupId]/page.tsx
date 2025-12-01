@@ -29,7 +29,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
       const user = users.find((u) => u.id === entry.userId)
       return {
         userId: entry.userId,
-        name: user?.name || 'Unknown',
+        name: user?.name || user?.username || 'Unknown',
         totalLeaguePoints: entry._sum.pointsAwarded || 0,
         gamesPlayed: entry._count.sessionId || 0,
         averagePlacement: entry._avg.placement || 0,
@@ -40,10 +40,26 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   // Members Data
   const members = await prisma.groupMember.findMany({
     where: { groupId },
-    include: { user: true }
+    include: { 
+      user: {
+        select: {
+          id: true,
+          name: true,
+          username: true
+        }
+      }
+    }
   })
   const memberUsers = members.map(m => m.user)
-  const allUsers = await prisma.user.findMany({ orderBy: { name: 'asc' } })
+  
+  const allUsers = await prisma.user.findMany({ 
+    select: {
+      id: true,
+      name: true,
+      username: true
+    },
+    orderBy: { username: 'asc' } 
+  })
 
   // History Data
   const sessions = await prisma.session.findMany({
@@ -59,7 +75,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   })
 
   const history = sessions.map(session => {
-    const winners = session.players.filter(p => p.placement === 1).map(p => p.user.name)
+    const winners = session.players.filter(p => p.placement === 1).map(p => p.user.name || p.user.username)
     return {
         id: session.id,
         gameName: session.game.name,

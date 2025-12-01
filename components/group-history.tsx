@@ -27,7 +27,7 @@ export function GroupHistory({ sessions }: { sessions: SessionHistory[] }) {
                 </div>
                 <div className="text-right">
                     <div className="text-sm font-semibold text-primary">
-                        Winner: {session.winnerNames.join(', ')}
+                        Winner: {session.winnerNames.length > 0 ? session.winnerNames.join(', ') : 'Unknown'}
                     </div>
                 </div>
               </div>
@@ -39,4 +39,3 @@ export function GroupHistory({ sessions }: { sessions: SessionHistory[] }) {
     </Card>
   )
 }
-

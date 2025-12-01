@@ -10,7 +10,13 @@ async function main() {
   const testUser = await prisma.user.upsert({
     where: { email: 'test@example.com' },
     update: {},
-    create: { email: 'test@example.com', name: 'Test User' },
+    create: { 
+      username: 'testuser',
+      email: 'test@example.com', 
+      name: 'Test User',
+      passwordHash: 'SEED_PLACEHOLDER_HASH',
+      isGuest: true
+    },
   })
 
   // 2. Ensure group exists (idempotent find)
@@ -27,18 +33,25 @@ async function main() {
   }
 
   // 3. Add new members
-  const newMembers = ['Bake', 'Amar', 'Mirza', 'Filip']
+  const newMembers = [
+    { name: 'Bake', username: 'bake' },
+    { name: 'Amar', username: 'amar' },
+    { name: 'Mirza', username: 'mirza' },
+    { name: 'Filip', username: 'filip' }
+  ]
   
-  for (const name of newMembers) {
-    // Create user if not exists (using name as email-like identifier since email is unique but nullable? No, email is optional)
-    // Actually, schema says email is optional unique. We can just use name.
-    // But to avoid duplicates on re-seed, we need a unique identifier. 
-    // Let's check if a user with this name exists, if not create.
-    // Note: This is simple seeding logic. In prod, use emails.
-    
-    let user = await prisma.user.findFirst({ where: { name } })
+  for (const member of newMembers) {
+    // Check if a user with this username exists, if not create
+    let user = await prisma.user.findFirst({ where: { username: member.username } })
     if (!user) {
-      user = await prisma.user.create({ data: { name } })
+      user = await prisma.user.create({ 
+        data: { 
+          username: member.username,
+          name: member.name,
+          passwordHash: 'SEED_PLACEHOLDER_HASH',
+          isGuest: true
+        } 
+      })
     }
 
     // Add to group if not already member
@@ -50,7 +63,7 @@ async function main() {
       await prisma.groupMember.create({
         data: { groupId: group.id, userId: user.id, role: 'MEMBER' }
       })
-      console.log(`Added ${name} to group`)
+      console.log(`Added ${member.name} to group`)
     }
   }
 

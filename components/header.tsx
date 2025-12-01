@@ -1,8 +1,14 @@
+'use client'
+
 import Link from 'next/link'
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
+import { UserMenu } from '@/components/user-menu'
 
 export default function Header() {
+  const { data: session, status } = useSession()
+  const isLoading = status === 'loading'
+
   return (
     <header className="border-b">
       <div className="container mx-auto py-4 flex justify-between items-center">
@@ -18,20 +24,27 @@ export default function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <SignedIn>
-            <Link href="/sessions/new">
-              <Button size="sm">Record Session</Button>
-            </Link>
-            <UserButton afterSignOutUrl="/" />
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal">
-              <Button size="sm" variant="outline">Sign In</Button>
-            </SignInButton>
-          </SignedOut>
+          {isLoading ? (
+            <div className="h-8 w-20 bg-slate-200 animate-pulse rounded" />
+          ) : session?.user ? (
+            <>
+              <Link href="/sessions/new">
+                <Button size="sm">Record Session</Button>
+              </Link>
+              <UserMenu />
+            </>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button size="sm" variant="outline">Sign In</Button>
+              </Link>
+              <Link href="/register">
+                <Button size="sm">Sign Up</Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </header>
   )
 }
-
