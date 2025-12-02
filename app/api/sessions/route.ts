@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { auth } from '@/auth'
 
+interface PlayerInput {
+  userId: string
+  rawScore: number
+  placement: number
+  pointsAwarded: number
+  scoreDetails?: Record<string, number> | string
+}
+
 export async function POST(request: Request) {
   try {
     const session = await auth()
@@ -13,14 +21,14 @@ export async function POST(request: Request) {
     const body = await request.json()
     const { gameId, templateId, groupId, playedAt, players } = body
 
-    const session = await prisma.session.create({
+    const newSession = await prisma.session.create({
       data: {
         gameId,
         templateId,
         groupId,
         playedAt: new Date(playedAt),
         players: {
-          create: players.map((p: any) => ({
+          create: players.map((p: PlayerInput) => ({
             userId: p.userId,
             rawScore: p.rawScore,
             placement: p.placement,
@@ -37,7 +45,7 @@ export async function POST(request: Request) {
       },
     })
 
-    return NextResponse.json(session)
+    return NextResponse.json(newSession)
   } catch (error) {
     console.error('Failed to create session:', error)
     return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
