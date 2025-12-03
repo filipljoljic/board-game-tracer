@@ -124,5 +124,52 @@ export const userRepository = {
       },
       orderBy: { createdAt: 'desc' }
     })
+  },
+
+  /**
+   * Set verification token for a user
+   */
+  async setVerificationToken(userId: string, token: string, expiry: Date) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        verificationToken: token,
+        verificationExpiry: expiry
+      }
+    })
+  },
+
+  /**
+   * Find a user by their verification token
+   */
+  async findByVerificationToken(token: string) {
+    return prisma.user.findUnique({
+      where: { verificationToken: token }
+    })
+  },
+
+  /**
+   * Mark a user's email as verified and clear the verification token
+   */
+  async verifyEmail(userId: string) {
+    return prisma.user.update({
+      where: { id: userId },
+      data: {
+        emailVerified: new Date(),
+        verificationToken: null,
+        verificationExpiry: null
+      }
+    })
+  },
+
+  /**
+   * Check if user's email is verified
+   */
+  async isEmailVerified(userId: string): Promise<boolean> {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { emailVerified: true }
+    })
+    return user?.emailVerified !== null
   }
 }

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { UserMenu } from '@/components/user-menu'
+import { RandomizerDialog } from '@/components/randomizer-dialog'
 
 export default function Header() {
   const { data: session, status } = useSession()
@@ -16,11 +17,12 @@ export default function Header() {
           <Link href="/" className="text-xl font-bold">
             BoardTracker
           </Link>
-          <nav className="space-x-4 text-sm font-medium">
+          <nav className="space-x-4 text-sm font-medium flex items-center">
             <Link href="/" className="hover:text-primary">Groups</Link>
             <Link href="/games" className="hover:text-primary">Games</Link>
             <Link href="/users" className="hover:text-primary">Users</Link>
             <Link href="/statistics" className="hover:text-primary">Statistics</Link>
+            <RandomizerDialog />
           </nav>
         </div>
         <div className="flex items-center gap-4">

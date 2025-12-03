@@ -14,11 +14,16 @@ export function LoginForm() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showResendOption, setShowResendOption] = useState(false)
+  const [lastEmail, setLastEmail] = useState<string | null>(null)
+  const [resendSuccess, setResendSuccess] = useState(false)
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setIsLoading(true)
     setError(null)
+    setShowResendOption(false)
+    setResendSuccess(false)
 
     const formData = new FormData(event.currentTarget)
     const username = formData.get('username') as string
@@ -32,7 +37,21 @@ export function LoginForm() {
       })
 
       if (result?.error) {
-        setError('Invalid username or password')
+        // Check if the error indicates email not verified
+        if (result.error.includes('EMAIL_NOT_VERIFIED:')) {
+          const email = result.error.split('EMAIL_NOT_VERIFIED:')[1]
+          setError('Your email address has not been verified. Please check your inbox.')
+          setShowResendOption(true)
+          setLastEmail(email)
+        } else {
+          setError('Invalid username or password')
+          // If login fails with credentials that might have an unverified email,
+          // show the option to resend verification
+          if (username.includes('@')) {
+            setShowResendOption(true)
+            setLastEmail(username)
+          }
+        }
         setIsLoading(false)
         return
       }
@@ -41,6 +60,30 @@ export function LoginForm() {
       router.refresh()
     } catch {
       setError('An unexpected error occurred')
+      setIsLoading(false)
+    }
+  }
+
+  async function handleResendVerification() {
+    if (!lastEmail) return
+
+    setIsLoading(true)
+    setResendSuccess(false)
+
+    try {
+      const response = await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: lastEmail })
+      })
+
+      if (response.ok) {
+        setResendSuccess(true)
+        setError(null)
+      }
+    } catch {
+      // Silently fail - the API returns success even if email doesn't exist (security)
+    } finally {
       setIsLoading(false)
     }
   }
@@ -58,6 +101,11 @@ export function LoginForm() {
           {error && (
             <div className="p-3 text-sm text-red-500 bg-red-50 border border-red-200 rounded-md">
               {error}
+            </div>
+          )}
+          {resendSuccess && (
+            <div className="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md">
+              Verification email sent! Please check your inbox.
             </div>
           )}
           <div className="space-y-2">
@@ -82,6 +130,18 @@ export function LoginForm() {
               disabled={isLoading}
             />
           </div>
+          {showResendOption && lastEmail && (
+            <div className="text-sm text-center">
+              <button
+                type="button"
+                onClick={handleResendVerification}
+                disabled={isLoading}
+                className="text-primary hover:underline disabled:opacity-50"
+              >
+                Didn&apos;t verify your email? Resend verification link
+              </button>
+            </div>
+          )}
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={isLoading}>

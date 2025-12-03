@@ -1,5 +1,6 @@
 import { userRepository } from '@/backend/repositories'
-import { hashPassword, verifyPassword, validateRegistration } from '@/backend/utils'
+import { hashPassword, verifyPassword, validateRegistration, generateVerificationToken, getVerificationTokenExpiry } from '@/backend/utils'
+import { emailService } from './email.service'
 import type { AuthCredentials, RegisterData, AuthResult, SessionUser } from '@/backend/types'
 
 /**
@@ -84,6 +85,23 @@ export const authService = {
       passwordHash,
       name: data.name
     })
+
+    // Generate verification token and send email
+    const verificationToken = generateVerificationToken()
+    const verificationExpiry = getVerificationTokenExpiry()
+
+    await userRepository.setVerificationToken(
+      user.id,
+      verificationToken,
+      verificationExpiry
+    )
+
+    // Send verification email (don't block registration if email fails)
+    await emailService.sendVerificationEmail(
+      data.email,
+      data.name || null,
+      verificationToken
+    )
 
     return {
       success: true,

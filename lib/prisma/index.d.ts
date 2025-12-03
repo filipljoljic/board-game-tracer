@@ -1557,6 +1557,9 @@ export namespace Prisma {
     passwordHash: string | null
     name: string | null
     isGuest: boolean | null
+    emailVerified: Date | null
+    verificationToken: string | null
+    verificationExpiry: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1568,6 +1571,9 @@ export namespace Prisma {
     passwordHash: string | null
     name: string | null
     isGuest: boolean | null
+    emailVerified: Date | null
+    verificationToken: string | null
+    verificationExpiry: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1579,6 +1585,9 @@ export namespace Prisma {
     passwordHash: number
     name: number
     isGuest: number
+    emailVerified: number
+    verificationToken: number
+    verificationExpiry: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1592,6 +1601,9 @@ export namespace Prisma {
     passwordHash?: true
     name?: true
     isGuest?: true
+    emailVerified?: true
+    verificationToken?: true
+    verificationExpiry?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1603,6 +1615,9 @@ export namespace Prisma {
     passwordHash?: true
     name?: true
     isGuest?: true
+    emailVerified?: true
+    verificationToken?: true
+    verificationExpiry?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1614,6 +1629,9 @@ export namespace Prisma {
     passwordHash?: true
     name?: true
     isGuest?: true
+    emailVerified?: true
+    verificationToken?: true
+    verificationExpiry?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1698,6 +1716,9 @@ export namespace Prisma {
     passwordHash: string
     name: string | null
     isGuest: boolean
+    emailVerified: Date | null
+    verificationToken: string | null
+    verificationExpiry: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1726,6 +1747,9 @@ export namespace Prisma {
     passwordHash?: boolean
     name?: boolean
     isGuest?: boolean
+    emailVerified?: boolean
+    verificationToken?: boolean
+    verificationExpiry?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -1740,6 +1764,9 @@ export namespace Prisma {
     passwordHash?: boolean
     name?: boolean
     isGuest?: boolean
+    emailVerified?: boolean
+    verificationToken?: boolean
+    verificationExpiry?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1751,6 +1778,9 @@ export namespace Prisma {
     passwordHash?: boolean
     name?: boolean
     isGuest?: boolean
+    emailVerified?: boolean
+    verificationToken?: boolean
+    verificationExpiry?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -1775,6 +1805,9 @@ export namespace Prisma {
       passwordHash: string
       name: string | null
       isGuest: boolean
+      emailVerified: Date | null
+      verificationToken: string | null
+      verificationExpiry: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2178,6 +2211,9 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly isGuest: FieldRef<"User", 'Boolean'>
+    readonly emailVerified: FieldRef<"User", 'DateTime'>
+    readonly verificationToken: FieldRef<"User", 'String'>
+    readonly verificationExpiry: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -8306,6 +8342,9 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     name: 'name',
     isGuest: 'isGuest',
+    emailVerified: 'emailVerified',
+    verificationToken: 'verificationToken',
+    verificationExpiry: 'verificationExpiry',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8478,6 +8517,9 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     isGuest?: BoolFilter<"User"> | boolean
+    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    verificationToken?: StringNullableFilter<"User"> | string | null
+    verificationExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionPlayerListRelationFilter
@@ -8491,6 +8533,9 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrderInput | SortOrder
     isGuest?: SortOrder
+    emailVerified?: SortOrderInput | SortOrder
+    verificationToken?: SortOrderInput | SortOrder
+    verificationExpiry?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sessions?: SessionPlayerOrderByRelationAggregateInput
@@ -8501,17 +8546,20 @@ export namespace Prisma {
     id?: string
     username?: string
     email?: string
+    verificationToken?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     passwordHash?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     isGuest?: BoolFilter<"User"> | boolean
+    emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
+    verificationExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionPlayerListRelationFilter
     groups?: GroupMemberListRelationFilter
-  }, "id" | "username" | "email">
+  }, "id" | "username" | "email" | "verificationToken">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -8520,6 +8568,9 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrderInput | SortOrder
     isGuest?: SortOrder
+    emailVerified?: SortOrderInput | SortOrder
+    verificationToken?: SortOrderInput | SortOrder
+    verificationExpiry?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -8537,6 +8588,9 @@ export namespace Prisma {
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     isGuest?: BoolWithAggregatesFilter<"User"> | boolean
+    emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    verificationToken?: StringNullableWithAggregatesFilter<"User"> | string | null
+    verificationExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -8874,6 +8928,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerCreateNestedManyWithoutUserInput
@@ -8887,6 +8944,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerUncheckedCreateNestedManyWithoutUserInput
@@ -8900,6 +8960,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUpdateManyWithoutUserNestedInput
@@ -8913,6 +8976,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUncheckedUpdateManyWithoutUserNestedInput
@@ -8926,6 +8992,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8937,6 +9006,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -8948,6 +9020,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9297,6 +9372,17 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type DateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -9340,6 +9426,9 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrder
     isGuest?: SortOrder
+    emailVerified?: SortOrder
+    verificationToken?: SortOrder
+    verificationExpiry?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9351,6 +9440,9 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrder
     isGuest?: SortOrder
+    emailVerified?: SortOrder
+    verificationToken?: SortOrder
+    verificationExpiry?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9362,6 +9454,9 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrder
     isGuest?: SortOrder
+    emailVerified?: SortOrder
+    verificationToken?: SortOrder
+    verificationExpiry?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9408,6 +9503,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -9699,6 +9808,10 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -10176,6 +10289,17 @@ export namespace Prisma {
     not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
+  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -10249,6 +10373,20 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10528,6 +10666,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerCreateNestedManyWithoutUserInput
@@ -10540,6 +10681,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerUncheckedCreateNestedManyWithoutUserInput
@@ -10591,6 +10735,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUpdateManyWithoutUserNestedInput
@@ -10603,6 +10750,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUncheckedUpdateManyWithoutUserNestedInput
@@ -10978,6 +11128,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     groups?: GroupMemberCreateNestedManyWithoutUserInput
@@ -10990,6 +11143,9 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    emailVerified?: Date | string | null
+    verificationToken?: string | null
+    verificationExpiry?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     groups?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
@@ -11045,6 +11201,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     groups?: GroupMemberUpdateManyWithoutUserNestedInput
@@ -11057,6 +11216,9 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
+    verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     groups?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput

@@ -4,6 +4,14 @@ import { prisma } from '@/lib/db'
 import bcrypt from 'bcrypt'
 import { authConfig } from './auth.config'
 
+// Custom error for unverified email
+class EmailNotVerifiedError extends Error {
+  constructor(email: string) {
+    super(`EMAIL_NOT_VERIFIED:${email}`)
+    this.name = 'EmailNotVerifiedError'
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
@@ -40,6 +48,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         if (!isValidPassword) {
           return null
+        }
+
+        // Check if email is verified
+        if (!user.emailVerified && user.email) {
+          throw new EmailNotVerifiedError(user.email)
         }
 
         return {

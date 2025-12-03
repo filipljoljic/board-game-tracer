@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -48,21 +47,8 @@ export function RegisterForm() {
         return
       }
 
-      // Auto-login after successful registration
-      const result = await signIn('credentials', {
-        username,
-        password,
-        redirect: false
-      })
-
-      if (result?.error) {
-        setError('Registration successful but login failed. Please try logging in.')
-        setIsLoading(false)
-        return
-      }
-
-      router.push('/')
-      router.refresh()
+      // Redirect to check-email page with email as query param
+      router.push(`/check-email?email=${encodeURIComponent(email)}`)
     } catch {
       setError('An unexpected error occurred')
       setIsLoading(false)

@@ -18,7 +18,9 @@ export const authConfig: NextAuthConfig = {
       // Public routes that don't require authentication
       const isOnAuthPage = 
         nextUrl.pathname === '/login' || 
-        nextUrl.pathname === '/register'
+        nextUrl.pathname === '/register' ||
+        nextUrl.pathname === '/check-email' ||
+        nextUrl.pathname === '/verify-email'
       
       // NextAuth API routes must always be accessible for auth to work
       const isAuthApiRoute = nextUrl.pathname.startsWith('/api/auth')
@@ -30,8 +32,8 @@ export const authConfig: NextAuthConfig = {
 
       // Allow auth pages for unauthenticated users
       if (isOnAuthPage) {
-        // Redirect logged-in users away from auth pages
-        if (isLoggedIn) {
+        // Redirect logged-in users away from auth pages (except verification pages)
+        if (isLoggedIn && (nextUrl.pathname === '/login' || nextUrl.pathname === '/register')) {
           return Response.redirect(new URL('/', nextUrl))
         }
         return true
