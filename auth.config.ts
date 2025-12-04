@@ -1,5 +1,16 @@
 import type { NextAuthConfig } from 'next-auth'
 
+// Validate AUTH_SECRET in production
+const authSecret = process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL
+
+if (isProduction && !authSecret) {
+  throw new Error(
+    'Missing AUTH_SECRET: Please define AUTH_SECRET or NEXTAUTH_SECRET environment variable. ' +
+    'Generate a secret with: openssl rand -base64 32'
+  )
+}
+
 // Edge-compatible auth config (NO database adapters, NO bcrypt)
 // This config is used by middleware which runs in the Edge runtime
 export const authConfig: NextAuthConfig = {
@@ -61,5 +72,5 @@ export const authConfig: NextAuthConfig = {
       return session
     }
   },
-  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET
+  secret: authSecret
 }

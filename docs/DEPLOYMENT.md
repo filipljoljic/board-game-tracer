@@ -1,6 +1,6 @@
 # Deployment Guide
 
-This guide walks you through deploying the Board Game Tracker to **Vercel** with **Neon** (PostgreSQL database) and **Clerk** (authentication).
+This guide walks you through deploying the Board Game Tracker to **Vercel** with **Neon** (PostgreSQL database) and **NextAuth** (authentication with email verification).
 
 ## Cost: $0/month
 
@@ -8,7 +8,7 @@ This guide walks you through deploying the Board Game Tracker to **Vercel** with
 |---------|---------|--------------|
 | Vercel Hobby | Hosting (frontend + backend) | $0 |
 | Neon Free | PostgreSQL database (0.5 GB) | $0 |
-| Clerk Free | Authentication (up to 10k users) | $0 |
+| Resend Free | Email delivery (3,000 emails/month) | $0 |
 
 ---
 
@@ -19,15 +19,15 @@ This guide walks you through deploying the Board Game Tracker to **Vercel** with
 
 ---
 
-## Step 1: Set Up Clerk Authentication
+## Step 1: Set Up Resend for Email Verification
 
-1. Go to [clerk.com](https://clerk.com) and sign up
-2. Create a new application called "Board Game Tracker"
-3. Select **Email** as the sign-in method
-4. Go to **API Keys** in the dashboard
-5. Copy your keys:
-   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (starts with `pk_`)
-   - `CLERK_SECRET_KEY` (starts with `sk_`)
+1. Go to [resend.com](https://resend.com) and sign up
+2. Verify your domain or use Resend's test domain
+3. Go to **API Keys** in the dashboard
+4. Create a new API key
+5. Copy your `RESEND_API_KEY` (starts with `re_`)
+
+**Note**: For production, you'll need to verify a domain. For testing, you can use Resend's test domain which allows sending to any email address.
 
 ---
 
@@ -49,7 +49,19 @@ This guide walks you through deploying the Board Game Tracker to **Vercel** with
 
 ---
 
-## Step 3: Update Schema for PostgreSQL
+## Step 3: Generate AUTH_SECRET
+
+NextAuth requires a secret key for encrypting session tokens. Generate one using:
+
+```bash
+openssl rand -base64 32
+```
+
+Copy the generated secret - you'll need it for the Vercel environment variables.
+
+---
+
+## Step 4: Update Schema for PostgreSQL
 
 Before deploying, update your Prisma schema to use PostgreSQL:
 
@@ -74,7 +86,7 @@ npx prisma db push
 
 ---
 
-## Step 4: Deploy to Vercel
+## Step 5: Deploy to Vercel
 
 ### Connect Repository
 
@@ -85,27 +97,23 @@ npx prisma db push
 
 ### Add Environment Variables
 
-In Vercel project settings, add these environment variables:
+In Vercel project settings, go to **Settings** → **Environment Variables** and add:
 
-| Variable | Value |
-|----------|-------|
-| `DATABASE_URL` | `postgresql://...` (from Neon) |
-| `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` | `pk_live_...` (from Clerk) |
-| `CLERK_SECRET_KEY` | `sk_live_...` (from Clerk) |
-| `NEXT_PUBLIC_CLERK_SIGN_IN_URL` | `/sign-in` |
-| `NEXT_PUBLIC_CLERK_SIGN_UP_URL` | `/sign-up` |
+| Variable | Value | Required | Notes |
+|----------|-------|----------|-------|
+| `DATABASE_URL` | `postgresql://...` | ✅ Yes | Full Neon connection string |
+| `AUTH_SECRET` | `...` (from Step 3) | ✅ Yes | Generated secret for NextAuth |
+| `RESEND_API_KEY` | `re_...` | ✅ Yes | From Resend dashboard |
+| `NEXT_PUBLIC_APP_URL` | `https://your-domain.com` | ❌ No | Only needed for custom domains. If not set, `VERCEL_URL` is used automatically |
+
+**Important Notes:**
+- `VERCEL_URL` is automatically provided by Vercel - you don't need to set it manually
+- If you're using a custom domain, set `NEXT_PUBLIC_APP_URL` to your full domain URL (e.g., `https://boardgames.example.com`)
+- For Vercel's default domain, leave `NEXT_PUBLIC_APP_URL` unset - the app will automatically use `VERCEL_URL`
 
 ### Deploy
 
 Click **Deploy** and wait for the build to complete.
-
----
-
-## Step 5: Configure Clerk for Production
-
-1. Go to your Clerk dashboard
-2. Navigate to **Domains** settings
-3. Add your Vercel URL (e.g., `board-game-tracker.vercel.app`)
 
 ---
 
@@ -124,14 +132,17 @@ Click **Deploy** and wait for the build to complete.
 For local development, create a `.env.local` file:
 
 ```env
-# Clerk (use test keys from dashboard)
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+# NextAuth secret (generate with: openssl rand -base64 32)
+AUTH_SECRET=your-local-secret-here
+
+# Resend API key (from Resend dashboard)
+RESEND_API_KEY=re_...
+
+# Optional: Set app URL for local development
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # Local SQLite database (for development)
-DATABASE_URL=file:./dev.db
+DATABASE_URL=file:./prisma/dev.db
 ```
 
 Then run:
@@ -140,22 +151,40 @@ Then run:
 npm run dev
 ```
 
+**Note**: For local development, you can use Resend's test API key which allows sending emails to any address without domain verification.
+
 ---
 
 ## Troubleshooting
 
-### "Unauthorized" error after sign-in
-- Check that `CLERK_SECRET_KEY` is set correctly in Vercel
-- Verify your domain is added to Clerk's allowed origins
+### MissingSecret error
+- **Error**: `MissingSecret: Please define a 'secret'`
+- **Solution**: Ensure `AUTH_SECRET` is set in Vercel environment variables
+- Generate a new secret with: `openssl rand -base64 32`
+- Add it to Vercel → Settings → Environment Variables → `AUTH_SECRET`
+
+### Verification emails contain localhost URLs
+- **Problem**: Email links point to `http://localhost:3000`
+- **Solution**: The app automatically uses `VERCEL_URL` if `NEXT_PUBLIC_APP_URL` is not set
+- If using a custom domain, set `NEXT_PUBLIC_APP_URL` to your full domain URL (e.g., `https://your-domain.com`)
+- Redeploy after adding the environment variable
 
 ### Database connection errors
 - Verify `DATABASE_URL` is the full Neon connection string
 - Make sure it includes `?sslmode=require` at the end
 - Check Neon dashboard to ensure database is active
 
+### Email sending fails
+- Verify `RESEND_API_KEY` is set correctly in Vercel
+- Check Resend dashboard for API key status
+- For production, ensure your domain is verified in Resend
+
 ### Build fails
 - Check Vercel build logs for specific errors
-- Ensure all environment variables are set
+- Ensure all required environment variables are set:
+  - `DATABASE_URL` ✅
+  - `AUTH_SECRET` ✅
+  - `RESEND_API_KEY` ✅
 
 ---
 
