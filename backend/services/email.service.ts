@@ -17,7 +17,7 @@ export const emailService = {
 
     try {
       const { error } = await resend.emails.send({
-        from: 'Board Game Tracker <onboarding@resend.dev>',
+        from: 'Board Game Tracker <info@board-game-tracker.com>',
         to: email,
         subject: getVerificationEmailSubject(),
         html: getVerificationEmailHtml({

@@ -15,10 +15,51 @@ export function isValidUsername(username: string): boolean {
 }
 
 /**
- * Validate password strength (min 8 chars)
+ * Validate password strength
+ * Requirements:
+ * - Minimum 8 characters
+ * - At least one number (0-9)
+ * - At least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)
  */
 export function isValidPassword(password: string): boolean {
-  return password.length >= 8
+  if (password.length < 8) {
+    return false
+  }
+
+  // Check for at least one number
+  const hasNumber = /[0-9]/.test(password)
+  if (!hasNumber) {
+    return false
+  }
+
+  // Check for at least one special character
+  const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)
+  if (!hasSpecialChar) {
+    return false
+  }
+
+  return true
+}
+
+/**
+ * Get detailed password validation errors
+ */
+export function getPasswordValidationErrors(password: string): string[] {
+  const errors: string[] = []
+
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters')
+  }
+
+  if (!/[0-9]/.test(password)) {
+    errors.push('Password must contain at least one number')
+  }
+
+  if (!/[!@#$%^&*()_+\-=\[\]{}|;:,.<>?]/.test(password)) {
+    errors.push('Password must contain at least one special character (!@#$%^&*()_+-=[]{}|;:,.<>?)')
+  }
+
+  return errors
 }
 
 /**
@@ -39,8 +80,9 @@ export function validateRegistration(data: {
     errors.push('Invalid email format')
   }
 
-  if (!isValidPassword(data.password)) {
-    errors.push('Password must be at least 8 characters')
+  const passwordErrors = getPasswordValidationErrors(data.password)
+  if (passwordErrors.length > 0) {
+    errors.push(...passwordErrors)
   }
 
   return {

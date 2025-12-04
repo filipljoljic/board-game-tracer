@@ -117,7 +117,7 @@ export function RegisterForm() {
               disabled={isLoading}
             />
             <p className="text-xs text-muted-foreground">
-              Must be at least 8 characters
+              Must be at least 8 characters, include at least one number and one special character (!@#$%^&*()_+-=[]{}|;:,.&lt;&gt;?)
             </p>
           </div>
           <div className="space-y-2">
