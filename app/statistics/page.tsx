@@ -51,10 +51,10 @@ export default function StatisticsPage() {
   }, [selectedUserId])
 
   return (
-    <main className="container mx-auto py-10 space-y-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Player Statistics</h1>
-        <div className="w-[200px]">
+    <main className="container mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <h1 className="text-2xl md:text-3xl font-bold">Player Statistics</h1>
+        <div className="w-full md:w-[200px]">
           <Select value={selectedUserId} onValueChange={setSelectedUserId}>
             <SelectTrigger data-testid="user-select">
               <SelectValue placeholder="Select player" />

@@ -72,18 +72,18 @@ export default function UsersPage() {
     }
   }
 
-  if (loading) return <div className="container mx-auto py-10">Loading...</div>
+  if (loading) return <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">Loading...</div>
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-6">Manage Users</h1>
+    <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">Manage Users</h1>
       
       <Card className="mb-8">
         <CardHeader>
           <CardTitle>Add New User</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={addUser} className="flex gap-4 items-end">
+          <form onSubmit={addUser} className="flex flex-col md:flex-row gap-4 md:items-end">
             <div className="grid w-full items-center gap-1.5">
               <label htmlFor="name" className="text-sm font-medium">Name</label>
               <Input 
@@ -102,7 +102,7 @@ export default function UsersPage() {
                 placeholder="john@example.com"
               />
             </div>
-            <Button type="submit">Add User</Button>
+            <Button type="submit" className="w-full md:w-auto">Add User</Button>
           </form>
         </CardContent>
       </Card>

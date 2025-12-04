@@ -85,12 +85,12 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
   })
 
   return (
-    <div className="container mx-auto py-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <div className="lg:col-span-2 space-y-8">
-        <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold">{group.name}</h1>
-            <Link href="/sessions/new">
-                <Button>Record Session</Button>
+    <div className="container mx-auto px-4 md:px-6 py-6 md:py-10 grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="lg:col-span-2 space-y-6 md:space-y-8">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+            <h1 className="text-2xl md:text-3xl font-bold">{group.name}</h1>
+            <Link href="/sessions/new" className="w-full md:w-auto">
+                <Button className="w-full md:w-auto">Record Session</Button>
             </Link>
         </div>
         

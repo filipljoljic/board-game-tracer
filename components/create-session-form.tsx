@@ -166,7 +166,7 @@ export default function CreateSessionForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto px-4 md:px-0">
       {step === 1 && (
         <Card>
           <CardHeader><CardTitle>Session Setup</CardTitle></CardHeader>
@@ -207,7 +207,7 @@ export default function CreateSessionForm() {
             {selectedGroupId && (
               <div>
                 <Label>Players</Label>
-                <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
                   {groupMembers.map(user => (
                     <div key={user.id} className="flex items-center space-x-2">
                       <Checkbox 
@@ -248,7 +248,7 @@ export default function CreateSessionForm() {
                 <div key={userId} className="border p-4 rounded">
                   <h3 className="font-bold mb-2">{user?.name}</h3>
                   {fields.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {fields.map(f => (
                         <div key={f.key}>
                           <Label>{f.label}</Label>
@@ -258,7 +258,7 @@ export default function CreateSessionForm() {
                           />
                         </div>
                       ))}
-                      <div className="col-span-2 mt-2 font-bold">
+                      <div className="col-span-1 md:col-span-2 mt-2 font-bold">
                         Total: {playerScores[userId]?.rawScore || 0}
                       </div>
                     </div>
@@ -279,9 +279,9 @@ export default function CreateSessionForm() {
               )
             })}
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-            <Button onClick={calculateScores}>Next: Review & Save</Button>
+          <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
+            <Button variant="outline" onClick={() => setStep(1)} className="w-full sm:w-auto">Back</Button>
+            <Button onClick={calculateScores} className="w-full sm:w-auto">Next: Review & Save</Button>
           </CardFooter>
         </Card>
       )}
@@ -290,55 +290,57 @@ export default function CreateSessionForm() {
         <Card>
           <CardHeader><CardTitle>Review Results</CardTitle></CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Player</TableHead>
-                  <TableHead>Raw Score</TableHead>
-                  <TableHead>Placement</TableHead>
-                  <TableHead>League Points</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {Object.values(playerScores)
-                  .sort((a, b) => a.placement - b.placement)
-                  .map(score => {
-                    const user = groupMembers.find(u => u.id === score.userId)
-                    return (
-                      <TableRow key={score.userId}>
-                        <TableCell>{user?.name}</TableCell>
-                        <TableCell>{score.rawScore}</TableCell>
-                        <TableCell>
-                          <Input 
-                            type="number" 
-                            className="w-16" 
-                            value={score.placement}
-                            onChange={(e) => setPlayerScores(prev => ({
-                              ...prev,
-                              [score.userId]: { ...prev[score.userId], placement: Number(e.target.value) }
-                            }))}
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Input 
-                            type="number" 
-                            className="w-16" 
-                            value={score.pointsAwarded}
-                            onChange={(e) => setPlayerScores(prev => ({
-                              ...prev,
-                              [score.userId]: { ...prev[score.userId], pointsAwarded: Number(e.target.value) }
-                            }))}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <Table className="min-w-[500px]">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Player</TableHead>
+                    <TableHead>Raw Score</TableHead>
+                    <TableHead>Placement</TableHead>
+                    <TableHead>League Points</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {Object.values(playerScores)
+                    .sort((a, b) => a.placement - b.placement)
+                    .map(score => {
+                      const user = groupMembers.find(u => u.id === score.userId)
+                      return (
+                        <TableRow key={score.userId}>
+                          <TableCell>{user?.name}</TableCell>
+                          <TableCell>{score.rawScore}</TableCell>
+                          <TableCell>
+                            <Input 
+                              type="number" 
+                              className="w-16" 
+                              value={score.placement}
+                              onChange={(e) => setPlayerScores(prev => ({
+                                ...prev,
+                                [score.userId]: { ...prev[score.userId], placement: Number(e.target.value) }
+                              }))}
+                            />
+                          </TableCell>
+                          <TableCell>
+                            <Input 
+                              type="number" 
+                              className="w-16" 
+                              value={score.pointsAwarded}
+                              onChange={(e) => setPlayerScores(prev => ({
+                                ...prev,
+                                [score.userId]: { ...prev[score.userId], pointsAwarded: Number(e.target.value) }
+                              }))}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                </TableBody>
+              </Table>
+            </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" onClick={() => setStep(2)} disabled={isSaving}>Back</Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+          <CardFooter className="flex flex-col sm:flex-row justify-between gap-2">
+            <Button variant="outline" onClick={() => setStep(2)} disabled={isSaving} className="w-full sm:w-auto">Back</Button>
+            <Button onClick={handleSave} disabled={isSaving} className="w-full sm:w-auto">
               {isSaving ? 'Saving...' : 'Save Session'}
             </Button>
           </CardFooter>
