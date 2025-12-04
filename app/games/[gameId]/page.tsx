@@ -17,15 +17,15 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ ga
   if (!game) notFound()
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
       <div className="mb-6">
         <Link href="/games" className="text-sm text-muted-foreground hover:underline">
           &larr; Back to Games
         </Link>
-        <div className="flex justify-between items-center mt-2">
-          <h1 className="text-3xl font-bold">{game.name}</h1>
-          <Link href={`/games/${game.id}/templates/new`}>
-            <Button>
+        <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mt-2">
+          <h1 className="text-2xl md:text-3xl font-bold">{game.name}</h1>
+          <Link href={`/games/${game.id}/templates/new`} className="w-full md:w-auto">
+            <Button className="w-full md:w-auto">
               <Plus className="w-4 h-4 mr-2" />
               New Template
             </Button>

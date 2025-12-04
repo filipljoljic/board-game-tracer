@@ -31,9 +31,9 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
   const templateFields = session.template ? JSON.parse(session.template.fields) : []
 
   return (
-    <div className="container mx-auto py-10">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{session.game.name}</h1>
+    <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">{session.game.name}</h1>
         <div className="text-muted-foreground">
             <p>Group: {session.group.name}</p>
             <p>Date: {session.playedAt.toLocaleDateString()} {session.playedAt.toLocaleTimeString()}</p>
@@ -46,7 +46,8 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
           <CardTitle>Results</CardTitle>
         </CardHeader>
         <CardContent>
-            <Table>
+            <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+              <Table className="min-w-[500px]">
                 <TableHeader>
                     <TableRow>
                         <TableHead>Placement</TableHead>
@@ -69,12 +70,13 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
                     ))}
                 </TableBody>
             </Table>
+            </div>
             
              {session.template && (
                 <div className="mt-8">
                     <h3 className="text-lg font-semibold mb-4">Score Breakdown</h3>
-                    <div className="overflow-x-auto">
-                         <Table>
+                    <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
+                         <Table className="min-w-[500px]">
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Player</TableHead>
