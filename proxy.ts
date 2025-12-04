@@ -4,7 +4,7 @@ import { authConfig } from './auth.config'
 // Use the edge-compatible auth config (no database, no bcrypt)
 const { auth } = NextAuth(authConfig)
 
-// Export as default middleware function for Next.js 16
+// Export as default proxy function for Next.js 16
 export default auth
 
 export const config = {
@@ -15,3 +15,4 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 }
+

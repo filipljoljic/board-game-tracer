@@ -12,7 +12,7 @@ if (isProduction && !authSecret) {
 }
 
 // Edge-compatible auth config (NO database adapters, NO bcrypt)
-// This config is used by middleware which runs in the Edge runtime
+// This config is used by proxy which runs in the Edge runtime
 export const authConfig: NextAuthConfig = {
   providers: [], // Providers are added in auth.ts (with DB access)
   session: {
