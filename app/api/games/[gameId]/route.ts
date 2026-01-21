@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ gameId: string }> }
 ) {
   const { gameId } = await params
@@ -15,7 +15,7 @@ export async function GET(
     })
     if (!game) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(game)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch game' }, { status: 500 })
   }
 }

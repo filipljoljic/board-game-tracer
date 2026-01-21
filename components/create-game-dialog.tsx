@@ -34,9 +34,11 @@ export function CreateGameDialog() {
         setOpen(false)
         setName('')
         router.refresh()
+      } else {
+        alert('Failed to create game')
       }
-    } catch (error) {
-      console.error('Failed to create game', error)
+    } catch {
+      alert('Failed to create game')
     } finally {
       setIsLoading(false)
     }

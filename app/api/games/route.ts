@@ -18,8 +18,7 @@ export async function GET() {
       },
     })
     return NextResponse.json(games)
-  } catch (error) {
-    console.error('Failed to fetch games:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 })
   }
 }
@@ -43,8 +42,7 @@ export async function POST(request: Request) {
       data: { name },
     })
     return NextResponse.json(game)
-  } catch (error) {
-    console.error('Failed to create game:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to create game' }, { status: 500 })
   }
 }

@@ -33,10 +33,16 @@ export default function StatisticsPage() {
     fetch('/api/users')
       .then(res => res.json())
       .then(data => {
-        setUsers(data)
-        if (data.length > 0) {
-            setSelectedUserId(data[0].id)
+        // Ensure data is an array before setting
+        const usersArray = Array.isArray(data) ? data : []
+        setUsers(usersArray)
+        if (usersArray.length > 0) {
+            setSelectedUserId(usersArray[0].id)
         }
+      })
+      .catch(() => {
+        // Handle error - set empty array
+        setUsers([])
       })
   }, [])
 

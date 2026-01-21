@@ -44,9 +44,7 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
   }
 
   const removeField = (index: number) => {
-    const newFields = [...fields]
-    newFields.splice(index, 1)
-    setFields(newFields)
+    setFields(fields.filter((_, i) => i !== index))
   }
 
   const updateField = (index: number, updates: Partial<TemplateField>) => {
@@ -111,7 +109,6 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
         alert(err.error || 'Failed to save')
       }
     } catch (e) {
-      console.error(e)
       alert('An error occurred')
     } finally {
       setLoading(false)

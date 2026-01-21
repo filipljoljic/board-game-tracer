@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 export function createMockRequest(
   method: string,
   body?: any,
-  params?: Record<string, string>
+  _params?: Record<string, string>
 ) {
   const url = "http://localhost:3000/api/test";
 

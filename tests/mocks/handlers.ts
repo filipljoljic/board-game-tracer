@@ -37,7 +37,7 @@ export const handlers = [
     return HttpResponse.json({ id: "1", name: body.name });
   }),
 
-  http.get("/api/groups/:groupId/members", ({ params }) => {
+  http.get("/api/groups/:groupId/members", ({ params: _params }) => {
     return HttpResponse.json([
       { id: "1", name: "Alice", email: "alice@test.com" },
       { id: "2", name: "Bob", email: "bob@test.com" },
@@ -81,7 +81,7 @@ export const handlers = [
   }),
 
   // Templates API
-  http.get("/api/games/:gameId/templates", ({ params }) => {
+  http.get("/api/games/:gameId/templates", ({ params: _params }) => {
     return HttpResponse.json([
       {
         id: "1",

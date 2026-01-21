@@ -154,7 +154,7 @@ export async function createTestTemplate(data: {
 export async function withTransaction<T>(fn: () => Promise<T>): Promise<T> {
   try {
     return await prismaTest.$transaction(async () => {
-      const result = await fn()
+      await fn()
       // Force rollback by throwing
       throw new Error('ROLLBACK')
     })

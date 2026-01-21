@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
-import { afterEach, beforeAll, afterAll, vi } from 'vitest'
+import { afterEach, afterAll, vi } from 'vitest'
 import { resetDatabase } from './helpers/db-helpers'
 
 // Cleanup after each test case (e.g., clearing jsdom)

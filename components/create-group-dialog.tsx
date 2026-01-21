@@ -43,9 +43,13 @@ export function CreateGroupDialog() {
       fetch('/api/users')
         .then(res => res.json())
         .then(data => {
-          setUsers(data)
+          // Ensure data is an array before setting
+          setUsers(Array.isArray(data) ? data : [])
         })
-        .catch(err => console.error('Failed to fetch users', err))
+        .catch(() => {
+          // Silently handle error - users will see empty list
+          setUsers([])
+        })
         .finally(() => setLoadingUsers(false))
     }
   }, [open])
@@ -81,9 +85,11 @@ export function CreateGroupDialog() {
         setName('')
         setSelectedMemberIds([])
         router.refresh()
+      } else {
+        alert('Failed to create group')
       }
-    } catch (error) {
-      console.error('Failed to create group', error)
+    } catch {
+      alert('Failed to create group')
     } finally {
       setIsLoading(false)
     }

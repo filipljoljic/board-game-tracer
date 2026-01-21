@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { prisma } from '@/lib/db'
 import { CreateGameDialog } from '@/components/create-game-dialog'
 

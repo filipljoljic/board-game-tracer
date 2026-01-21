@@ -43,10 +43,15 @@ export default function CreateSessionForm() {
   // Scoring
   const [playerScores, setPlayerScores] = useState<Record<string, PlayerScore>>({})
   
-  // Fetch initial data
+  // Fetch initial data in parallel
   useEffect(() => {
-    fetch('/api/groups').then(res => res.json()).then(setGroups)
-    fetch('/api/games').then(res => res.json()).then(setGames)
+    Promise.all([
+      fetch('/api/groups').then(res => res.json()),
+      fetch('/api/games').then(res => res.json())
+    ]).then(([groupsData, gamesData]) => {
+      setGroups(groupsData)
+      setGames(gamesData)
+    })
   }, [])
 
   // Fetch members when group changes
@@ -84,21 +89,20 @@ export default function CreateSessionForm() {
   }
 
   const calculateScores = () => {
-    const players = selectedPlayerIds.map(id => ({ ...playerScores[id] }))
-    
-    // Sort by raw score descending
-    players.sort((a, b) => b.rawScore - a.rawScore)
-    
-    // Assign placement and points
-    const count = players.length
-    players.forEach((p, index) => {
-      p.placement = index + 1
-      p.pointsAwarded = count - index // 5, 4, 3, 2, 1 pattern
-    })
+    // Map, sort, and assign in one pass (immutable)
+    const count = selectedPlayerIds.length
+    const sortedPlayers = selectedPlayerIds
+      .map(id => ({ ...playerScores[id] }))
+      .toSorted((a, b) => b.rawScore - a.rawScore)
+      .map((p, index) => ({
+        ...p,
+        placement: index + 1,
+        pointsAwarded: count - index // 5, 4, 3, 2, 1 pattern
+      }))
     
     // Update state
     const newScores = { ...playerScores }
-    players.forEach(p => {
+    sortedPlayers.forEach(p => {
       newScores[p.userId] = p
     })
     setPlayerScores(newScores)
@@ -129,8 +133,7 @@ export default function CreateSessionForm() {
       } else {
         alert('Failed to save session')
       }
-    } catch (error) {
-      console.error('Failed to save session', error)
+    } catch {
       alert('Failed to save session')
     } finally {
       setIsSaving(false)

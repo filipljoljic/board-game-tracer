@@ -56,8 +56,8 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
         const error = await res.json()
         alert(error.error || 'Failed to add member')
       }
-    } catch (error) {
-      console.error('Failed to add member', error)
+    } catch {
+      alert('Failed to add member')
     } finally {
       setIsAdding(false)
     }
@@ -77,9 +77,11 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
       
       if (res.ok) {
         router.refresh()
+      } else {
+        alert('Failed to remove member')
       }
-    } catch (error) {
-      console.error('Failed to remove member', error)
+    } catch {
+      alert('Failed to remove member')
     } finally {
       setRemovingId(null)
     }

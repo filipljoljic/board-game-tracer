@@ -18,8 +18,7 @@ export async function GET() {
       }
     })
     return NextResponse.json(groups)
-  } catch (error) {
-    console.error('Failed to fetch groups:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch groups' }, { status: 500 })
   }
 }
@@ -61,8 +60,7 @@ export async function POST(request: Request) {
       }
     })
     return NextResponse.json(group)
-  } catch (error) {
-    console.error('Failed to create group:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to create group' }, { status: 500 })
   }
 }

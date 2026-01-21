@@ -46,8 +46,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(newSession)
-  } catch (error) {
-    console.error('Failed to create session:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
   }
 }
@@ -74,8 +73,7 @@ export async function GET(request: Request) {
       orderBy: { playedAt: 'desc' },
     })
     return NextResponse.json(sessions)
-  } catch (error) {
-    console.error('Failed to fetch sessions:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 })
   }
 }

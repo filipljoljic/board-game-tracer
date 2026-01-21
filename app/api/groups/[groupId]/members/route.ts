@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ groupId: string }> }
 ) {
   const { groupId } = await params
@@ -12,8 +12,7 @@ export async function GET(
       include: { user: true },
     })
     return NextResponse.json(members.map((m) => m.user))
-  } catch (error) {
-    console.error('Failed to fetch group members:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch group members' }, { status: 500 })
   }
 }
@@ -50,8 +49,7 @@ export async function POST(
 
     return NextResponse.json(member.user)
 
-  } catch (error) {
-    console.error('Failed to add group member:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to add group member' }, { status: 500 })
   }
 }
@@ -78,8 +76,7 @@ export async function DELETE(
         
         return NextResponse.json({ success: true })
 
-    } catch (error) {
-        console.error('Failed to remove group member:', error)
+    } catch {
         return NextResponse.json({ error: 'Failed to remove group member' }, { status: 500 })
     }
 }

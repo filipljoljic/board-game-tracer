@@ -26,9 +26,11 @@ export default function UsersPage() {
     try {
       const res = await fetch('/api/users')
       const data = await res.json()
-      setUsers(data)
-    } catch (error) {
-      console.error('Failed to fetch users', error)
+      // Ensure data is an array before setting
+      setUsers(Array.isArray(data) ? data : [])
+    } catch {
+      // Silently handle error - users will see empty list
+      setUsers([])
     } finally {
         setLoading(false)
     }
@@ -48,9 +50,11 @@ export default function UsersPage() {
         setNewName('')
         setNewEmail('')
         fetchUsers()
+      } else {
+        alert('Failed to add user')
       }
-    } catch (error) {
-      console.error('Failed to add user', error)
+    } catch {
+      alert('Failed to add user')
     }
   }
 
@@ -67,8 +71,8 @@ export default function UsersPage() {
         const error = await res.json()
         alert(error.error || 'Failed to delete user')
       }
-    } catch (error) {
-      console.error('Failed to delete user', error)
+    } catch {
+      alert('Failed to delete user')
     }
   }
 

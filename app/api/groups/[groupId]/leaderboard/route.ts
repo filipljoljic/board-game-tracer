@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ groupId: string }> }
 ) {
   const { groupId } = await params
@@ -44,8 +44,7 @@ export async function GET(
       .sort((a, b) => b.totalLeaguePoints - a.totalLeaguePoints)
 
     return NextResponse.json(leaderboard)
-  } catch (error) {
-    console.error('Failed to fetch leaderboard:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch leaderboard' }, { status: 500 })
   }
 }

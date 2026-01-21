@@ -28,7 +28,6 @@ interface RandomizedPlayer {
 export function RandomizerDialog() {
   const [open, setOpen] = React.useState(false)
   const [players, setPlayers] = React.useState<string[]>(['', ''])
-  const [newPlayerName, setNewPlayerName] = React.useState('')
   const [randomizedOrder, setRandomizedOrder] = React.useState<RandomizedPlayer[]>([])
   const [isShuffling, setIsShuffling] = React.useState(false)
   const [revealedCount, setRevealedCount] = React.useState(0)
@@ -89,12 +88,6 @@ export function RandomizerDialog() {
   }
 
   const handleReset = () => {
-    setRandomizedOrder([])
-    setRevealedCount(0)
-  }
-
-  const handleClearAll = () => {
-    setPlayers(['', ''])
     setRandomizedOrder([])
     setRevealedCount(0)
   }

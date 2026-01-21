@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test";
 import { HomePage } from "./pages/home.page";
-import { GroupPage } from "./pages/group.page";
 
 test.describe("Group Management", () => {
   test("should create a new group", async ({ page }) => {

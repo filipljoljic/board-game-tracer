@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ templateId: string }> }
 ) {
   const { templateId } = await params
@@ -12,7 +12,7 @@ export async function GET(
     })
     if (!template) return NextResponse.json({ error: 'Not found' }, { status: 404 })
     return NextResponse.json(template)
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch template' }, { status: 500 })
   }
 }
@@ -36,14 +36,13 @@ export async function PUT(
       },
     })
     return NextResponse.json(template)
-  } catch (error) {
-    console.error('Failed to update template:', error)
+  } catch {
     return NextResponse.json({ error: 'Failed to update template' }, { status: 500 })
   }
 }
 
 export async function DELETE(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ templateId: string }> }
 ) {
   const { templateId } = await params
@@ -52,7 +51,7 @@ export async function DELETE(
       where: { id: templateId },
     })
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
   }
 }
