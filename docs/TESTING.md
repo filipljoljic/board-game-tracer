@@ -9,7 +9,6 @@ This document provides comprehensive guidance on testing for the Board Game Trac
 - [Running Tests](#running-tests)
 - [Writing Tests](#writing-tests)
 - [Test Structure](#test-structure)
-- [Testmo Integration](#testmo-integration)
 - [Best Practices](#best-practices)
 - [Troubleshooting](#troubleshooting)
 
@@ -34,7 +33,6 @@ Our testing strategy follows the testing pyramid:
 - **Playwright** - End-to-end browser testing
 - **React Testing Library** - Component testing
 - **MSW** - API mocking for component tests
-- **Testmo** - Test management and reporting platform
 
 ## Running Tests
 
@@ -256,48 +254,6 @@ await homePage.goto();
 await homePage.clickCreateGroup();
 ```
 
-## Testmo Integration
-
-### Setup
-
-1. Create a Testmo account at https://testmo.com
-2. Create a project for your application
-3. Generate an API token from your profile settings
-4. Set environment variables:
-
-```bash
-# .env.test (DO NOT COMMIT)
-TESTMO_URL="https://your-instance.testmo.net"
-TESTMO_TOKEN="your-api-token-here"
-TESTMO_PROJECT_ID="1"
-```
-
-### Submitting Test Results
-
-Test results are automatically submitted to Testmo in CI/CD pipelines.
-
-**Manual submission:**
-
-```bash
-# Run tests and generate JUnit XML reports
-npm run test:unit
-npm run test:e2e
-
-# Submit to Testmo
-testmo automation:run:submit \
-  --instance $TESTMO_URL \
-  --project-id $TESTMO_PROJECT_ID \
-  --name "Manual Test Run" \
-  --source "local" \
-  --results test-results/*.xml
-```
-
-### Viewing Results
-
-- Visit your Testmo dashboard at your instance URL
-- View test runs, trends, and flaky test detection
-- Analyze test duration and success rates over time
-
 ## Best Practices
 
 ### General
@@ -391,21 +347,14 @@ Tests run automatically in GitHub Actions on every push and pull request.
 1. Install dependencies
 2. Run unit/integration tests with Vitest
 3. Run E2E tests with Playwright
-4. Generate JUnit XML reports
-5. Submit results to Testmo
-6. Upload test artifacts on failure
-
-**Configure secrets:**
-
-- `TESTMO_URL` - Your Testmo instance URL
-- `TESTMO_TOKEN` - Your Testmo API token
+4. Generate test reports
+5. Upload test artifacts on failure
 
 ## Additional Resources
 
 - [Vitest Documentation](https://vitest.dev/)
 - [Playwright Documentation](https://playwright.dev/)
 - [React Testing Library](https://testing-library.com/react)
-- [Testmo Documentation](https://docs.testmo.com/)
 - [Testing Best Practices](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
 
 ## Getting Help

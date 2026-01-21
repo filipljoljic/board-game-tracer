@@ -13,7 +13,6 @@ This project has comprehensive test coverage using modern testing tools.
 - **Vitest** - Fast unit and integration tests
 - **Playwright** - End-to-end browser testing
 - **React Testing Library** - Component testing
-- **Testmo** - Test management and reporting
 
 ### Quick Start
 
@@ -55,12 +54,11 @@ npm run test:coverage
 
 ### CI/CD
 
-Tests run automatically on every push and pull request via GitHub Actions. Results are reported to Testmo for tracking and analysis.
+Tests run automatically on every push and pull request via GitHub Actions.
 
 ### Documentation
 
 - **Full Testing Guide**: [docs/TESTING.md](docs/TESTING.md)
-- **Testmo Setup**: [docs/TESTMO_SETUP.md](docs/TESTMO_SETUP.md)
 - **Testing Patterns**: [.cursor/rules/testing-patterns.mdc](.cursor/rules/testing-patterns.mdc)
 
 ### Test Commands Reference
@@ -81,5 +79,3 @@ Tests run automatically on every push and pull request via GitHub Actions. Resul
 ## 📊 Test Results
 
 [![Tests](https://github.com/your-username/board-game-tracker/actions/workflows/test.yml/badge.svg)](https://github.com/your-username/board-game-tracker/actions/workflows/test.yml)
-
-View detailed test reports and trends in [Testmo](https://your-instance.testmo.net)

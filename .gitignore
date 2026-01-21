@@ -16,6 +16,10 @@
 /playwright-report
 /.playwright
 /test-results/
+test-output.log
+test-results.json
+test-reports.tar.gz
+*.test.log
 
 # next.js
 /.next/
