@@ -74,19 +74,3 @@ The project uses **SQLite** for simplicity.
 ## 📚 Documentation
 
 For detailed technical documentation, architecture, and API reference, please see [DOCUMENTATION.md](./DOCUMENTATION.md).
-
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.
-.

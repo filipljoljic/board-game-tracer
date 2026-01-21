@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { toast } from 'sonner'
 
 type Game = { id: string; name: string }
 type Group = { id: string; name: string }
@@ -129,12 +130,17 @@ export default function CreateSessionForm() {
       })
 
       if (res.ok) {
+        toast.success('Session saved successfully')
         router.push(`/groups/${selectedGroupId}`) // Redirect to leaderboard
       } else {
-        alert('Failed to save session')
+        toast.error('Failed to save session', {
+          description: 'Please check your input and try again'
+        })
       }
     } catch {
-      alert('Failed to save session')
+      toast.error('Failed to save session', {
+        description: 'An unexpected error occurred'
+      })
     } finally {
       setIsSaving(false)
     }

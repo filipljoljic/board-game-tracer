@@ -11,8 +11,20 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Trash2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface User {
   id: string
@@ -51,20 +63,24 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
       if (res.ok) {
         setOpen(false)
         setSelectedUserId('')
+        toast.success('Member added successfully')
         router.refresh()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to add member')
+        toast.error(error.error || 'Failed to add member', {
+          description: 'This user may already be in the group'
+        })
       }
     } catch {
-      alert('Failed to add member')
+      toast.error('Failed to add member', {
+        description: 'An unexpected error occurred'
+      })
     } finally {
       setIsAdding(false)
     }
   }
 
   const removeMember = async (userId: string) => {
-    if (!confirm('Remove this member?')) return
     if (removingId) return
 
     setRemovingId(userId)
@@ -76,12 +92,17 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
       })
       
       if (res.ok) {
+        toast.success('Member removed successfully')
         router.refresh()
       } else {
-        alert('Failed to remove member')
+        toast.error('Failed to remove member', {
+          description: 'Please try again or contact support'
+        })
       }
     } catch {
-      alert('Failed to remove member')
+      toast.error('Failed to remove member', {
+        description: 'An unexpected error occurred'
+      })
     } finally {
       setRemovingId(null)
     }
@@ -126,15 +147,33 @@ export function GroupMembers({ groupId, members, allUsers }: GroupMembersProps) 
           {members.map(member => (
             <li key={member.id} className="flex justify-between items-center p-2 rounded hover:bg-accent/50 text-sm">
               <span>{getDisplayName(member)}</span>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8" 
-                onClick={() => removeMember(member.id)}
-                disabled={removingId === member.id}
-              >
-                 <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8" 
+                    disabled={removingId === member.id}
+                    aria-label={`Remove ${getDisplayName(member)}`}
+                  >
+                    <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Remove Member</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to remove {getDisplayName(member)} from this group?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => removeMember(member.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Remove
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </li>
           ))}
           {members.length === 0 && <p className="text-muted-foreground text-sm py-2">No members yet.</p>}

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { Trash2, Plus, Save } from 'lucide-react'
+import { toast } from 'sonner'
 
 type TemplateField = {
   key: string
@@ -65,7 +66,10 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
   }
 
   const handleSave = async () => {
-    if (!name) return alert('Please enter a template name')
+    if (!name) {
+      toast.error('Please enter a template name')
+      return
+    }
     
     // Validate fields
     const invalidFields = fields.some(f => !f.label || !f.key)
@@ -76,7 +80,8 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
             key: f.key || f.label.toLowerCase().replace(/[^a-z0-9]/g, '')
         }))
         if (fixedFields.some(f => !f.key || !f.label)) {
-             return alert('All fields must have a label')
+          toast.error('All fields must have a label')
+          return
         }
         setFields(fixedFields) // State update is async, so proceed with fixedFields
     }
@@ -102,14 +107,19 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
       })
 
       if (res.ok) {
+        toast.success('Template saved successfully')
         router.push(`/games/${gameId}`)
         router.refresh()
       } else {
         const err = await res.json()
-        alert(err.error || 'Failed to save')
+        toast.error(err.error || 'Failed to save template', {
+          description: 'Please check your input and try again'
+        })
       }
     } catch (e) {
-      alert('An error occurred')
+      toast.error('An error occurred', {
+        description: 'Please try again or contact support'
+      })
     } finally {
       setLoading(false)
     }
@@ -123,12 +133,16 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <Label htmlFor="name">Template Name</Label>
+            <Label htmlFor="name">
+              Template Name <span className="text-destructive">*</span>
+            </Label>
             <Input 
               id="name" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
               placeholder="e.g., Base Game, Expansion + Promos"
+              required
+              aria-required="true"
             />
           </div>
 

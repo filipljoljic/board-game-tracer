@@ -1,6 +1,9 @@
 "use client"
 
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { Trophy } from 'lucide-react'
 
 type LeaderboardEntry = {
   userId: string
@@ -13,8 +16,17 @@ type LeaderboardEntry = {
 export default function LeaderboardTable({ data }: { data: LeaderboardEntry[] }) {
   if (data.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground" data-testid="leaderboard-empty">
-        <p>No sessions recorded yet. Record a session to start tracking scores!</p>
+      <div className="text-center py-12" data-testid="leaderboard-empty">
+        <div className="mx-auto w-16 h-16 rounded-full bg-muted flex items-center justify-center mb-4">
+          <Trophy className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h3 className="text-lg font-semibold mb-2">No sessions yet</h3>
+        <p className="text-sm text-muted-foreground mb-6">
+          Record your first game session to start tracking scores and competing for the top spot!
+        </p>
+        <Button asChild>
+          <Link href="/sessions/new">Record Session</Link>
+        </Button>
       </div>
     )
   }

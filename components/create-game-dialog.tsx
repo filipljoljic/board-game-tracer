@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 export function CreateGameDialog() {
   const [open, setOpen] = useState(false)
@@ -33,12 +34,17 @@ export function CreateGameDialog() {
       if (res.ok) {
         setOpen(false)
         setName('')
+        toast.success('Game created successfully')
         router.refresh()
       } else {
-        alert('Failed to create game')
+        toast.error('Failed to create game', {
+          description: 'Please try again or contact support'
+        })
       }
     } catch {
-      alert('Failed to create game')
+      toast.error('Failed to create game', {
+        description: 'An unexpected error occurred'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -57,7 +63,9 @@ export function CreateGameDialog() {
         </DialogHeader>
         <form onSubmit={createGame} className="space-y-4">
           <div>
-            <label htmlFor="name" className="text-sm font-medium">Game Name</label>
+            <label htmlFor="name" className="text-sm font-medium">
+              Game Name <span className="text-destructive">*</span>
+            </label>
             <Input 
               id="name" 
               value={name} 
@@ -65,6 +73,8 @@ export function CreateGameDialog() {
               placeholder="Catan, Ticket to Ride..."
               data-testid="game-name-input"
               disabled={isLoading}
+              required
+              aria-required="true"
             />
           </div>
           <Button 

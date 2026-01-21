@@ -95,10 +95,10 @@ export function RandomizerDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="hover:text-primary inline-flex items-center gap-1.5 text-sm font-medium">
+        <Button variant="ghost" size="sm" className="gap-1.5">
           <Dices className="size-4" />
           Randomizer
-        </button>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -124,27 +124,35 @@ export function RandomizerDialog() {
 
               <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
                 {players.map((player, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-medium">
-                      {index + 1}
+                  <div key={index} className="space-y-1">
+                    <label htmlFor={`player-${index}`} className="sr-only">
+                      Player {index + 1}
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-medium">
+                        {index + 1}
+                      </div>
+                      <Input
+                        id={`player-${index}`}
+                        placeholder={`Player ${index + 1}`}
+                        value={player}
+                        onChange={(e) => handlePlayerChange(index, e.target.value)}
+                        className="flex-1"
+                        aria-label={`Player ${index + 1} name`}
+                      />
+                      {players.length > 2 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => removePlayer(index)}
+                          className="shrink-0 text-muted-foreground hover:text-destructive"
+                          aria-label={`Remove player ${index + 1}`}
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      )}
                     </div>
-                    <Input
-                      placeholder={`Player ${index + 1}`}
-                      value={player}
-                      onChange={(e) => handlePlayerChange(index, e.target.value)}
-                      className="flex-1"
-                    />
-                    {players.length > 2 && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => removePlayer(index)}
-                        className="shrink-0 text-muted-foreground hover:text-destructive"
-                      >
-                        <X className="size-4" />
-                      </Button>
-                    )}
                   </div>
                 ))}
               </div>

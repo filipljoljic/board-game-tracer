@@ -1,4 +1,10 @@
 import CreateSessionForm from '@/components/create-session-form'
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Record New Session | Board Game Tracker',
+  description: 'Record a new board game session with scores and placements'
+}
 
 export default function NewSessionPage() {
   return (

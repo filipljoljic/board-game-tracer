@@ -4,7 +4,19 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface User {
   id: string
@@ -49,30 +61,38 @@ export default function UsersPage() {
       if (res.ok) {
         setNewName('')
         setNewEmail('')
+        toast.success('User added successfully')
         fetchUsers()
       } else {
-        alert('Failed to add user')
+        toast.error('Failed to add user', {
+          description: 'Please try again or contact support'
+        })
       }
     } catch {
-      alert('Failed to add user')
+      toast.error('Failed to add user', {
+        description: 'An unexpected error occurred'
+      })
     }
   }
 
   const deleteUser = async (userId: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return
-
     try {
       const res = await fetch(`/api/users/${userId}`, {
         method: 'DELETE',
       })
       if (res.ok) {
+        toast.success('User deleted successfully')
         fetchUsers()
       } else {
         const error = await res.json()
-        alert(error.error || 'Failed to delete user')
+        toast.error(error.error || 'Failed to delete user', {
+          description: 'Please try again or contact support'
+        })
       }
     } catch {
-      alert('Failed to delete user')
+      toast.error('Failed to delete user', {
+        description: 'An unexpected error occurred'
+      })
     }
   }
 
@@ -89,12 +109,16 @@ export default function UsersPage() {
         <CardContent>
           <form onSubmit={addUser} className="flex flex-col md:flex-row gap-4 md:items-end">
             <div className="grid w-full items-center gap-1.5">
-              <label htmlFor="name" className="text-sm font-medium">Name</label>
+              <label htmlFor="name" className="text-sm font-medium">
+                Name <span className="text-destructive">*</span>
+              </label>
               <Input 
                 id="name" 
                 value={newName} 
                 onChange={(e) => setNewName(e.target.value)} 
                 placeholder="John Doe"
+                required
+                aria-required="true"
               />
             </div>
             <div className="grid w-full items-center gap-1.5">
@@ -119,9 +143,27 @@ export default function UsersPage() {
                 <p className="font-semibold">{user.name}</p>
                 {user.email && <p className="text-sm text-muted-foreground">{user.email}</p>}
               </div>
-              <Button variant="destructive" size="icon" onClick={() => deleteUser(user.id)}>
-                <Trash2 className="h-4 w-4" />
-              </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="destructive" size="icon" aria-label={`Delete ${user.name}`}>
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Delete User</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Are you sure you want to delete {user.name}? This action cannot be undone and will permanently remove all their data.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => deleteUser(user.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Delete
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </CardContent>
           </Card>
         ))}

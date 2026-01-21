@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 interface User {
   id: string
@@ -84,12 +85,17 @@ export function CreateGroupDialog() {
         setOpen(false)
         setName('')
         setSelectedMemberIds([])
+        toast.success('Group created successfully')
         router.refresh()
       } else {
-        alert('Failed to create group')
+        toast.error('Failed to create group', {
+          description: 'Please try again or contact support'
+        })
       }
     } catch {
-      alert('Failed to create group')
+      toast.error('Failed to create group', {
+        description: 'An unexpected error occurred'
+      })
     } finally {
       setIsLoading(false)
     }
@@ -108,7 +114,9 @@ export function CreateGroupDialog() {
         </DialogHeader>
         <form onSubmit={createGroup} className="space-y-4">
           <div>
-            <label htmlFor="name" className="text-sm font-medium">Group Name</label>
+            <label htmlFor="name" className="text-sm font-medium">
+              Group Name <span className="text-destructive">*</span>
+            </label>
             <Input 
               id="name" 
               value={name} 
@@ -116,6 +124,8 @@ export function CreateGroupDialog() {
               placeholder="Board Game Night"
               data-testid="group-name-input"
               disabled={isLoading}
+              required
+              aria-required="true"
             />
           </div>
           

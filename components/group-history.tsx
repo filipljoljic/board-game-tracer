@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Calendar } from 'lucide-react'
 
 interface SessionHistory {
     id: string
@@ -33,7 +35,20 @@ export function GroupHistory({ sessions }: { sessions: SessionHistory[] }) {
               </div>
             </Link>
           ))}
-          {sessions.length === 0 && <p className="text-muted-foreground">No sessions recorded.</p>}
+          {sessions.length === 0 && (
+            <div className="text-center py-8">
+              <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+                <Calendar className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <h4 className="font-medium mb-1">No sessions yet</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Start recording game sessions to build your history
+              </p>
+              <Button size="sm" asChild>
+                <Link href="/sessions/new">Record First Session</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
