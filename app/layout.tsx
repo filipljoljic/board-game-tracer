@@ -12,7 +12,16 @@ const inter = Inter({ subsets: ["latin"] });
  * Base URL for the application
  * Used for canonical URLs, Open Graph, and sitemap generation
  */
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.board-game-tracker.com';
+function getBaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_APP_URL || 'https://www.board-game-tracker.com';
+  // Ensure URL has protocol prefix
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
+const BASE_URL = getBaseUrl();
 
 /**
  * Root Layout Metadata

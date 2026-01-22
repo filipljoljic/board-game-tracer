@@ -16,7 +16,16 @@ import { prisma } from '@/lib/db'
  */
 
 // Update this to your production domain
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://www.board-game-tracker.com'
+function getBaseUrl(): string {
+  const url = process.env.NEXT_PUBLIC_APP_URL || 'https://www.board-game-tracker.com';
+  // Ensure URL has protocol prefix
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return `https://${url}`;
+  }
+  return url;
+}
+
+const BASE_URL = getBaseUrl()
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Static pages that always exist
