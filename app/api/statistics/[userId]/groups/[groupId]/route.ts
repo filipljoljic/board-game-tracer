@@ -3,19 +3,26 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string; groupId: string }> }
 ) {
-  const { userId } = await params
+  const { userId, groupId } = await params
   
   try {
-    // Fetch user and their groups in parallel
-    const [user, userGroups] = await Promise.all([
+    // Fetch user, group, and player sessions in parallel
+    const [user, group, playerSessions] = await Promise.all([
       prisma.user.findUnique({ where: { id: userId } }),
-      prisma.groupMember.findMany({
-        where: { userId },
+      prisma.group.findUnique({ where: { id: groupId } }),
+      prisma.sessionPlayer.findMany({
+        where: { 
+          userId,
+          session: { groupId }
+        },
         include: {
-          group: {
-            select: { id: true, name: true }
+          session: {
+            include: {
+              game: true,
+              players: true // Needed to determine player count for "Last"
+            }
           }
         }
       })
@@ -24,18 +31,10 @@ export async function GET(
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
-
-    const playerSessions = await prisma.sessionPlayer.findMany({
-      where: { userId },
-      include: {
-        session: {
-          include: {
-            game: true,
-            players: true // Needed to determine player count for "Last"
-          }
-        }
-      }
-    })
+    
+    if (!group) {
+      return NextResponse.json({ error: 'Group not found' }, { status: 404 })
+    }
 
     const totalGames = playerSessions.length
     let wins = 0
@@ -67,9 +66,6 @@ export async function GET(
     })
 
     // Format for Pie Chart (1st, 2nd, 3rd, Other)
-    // Note: "Last" is a separate metric, not necessarily mutually exclusive with 2nd/3rd (e.g. 2 player game, 2nd is last)
-    // For the Pie Chart, we usually want mutually exclusive.
-    // Let's do: 1st, 2nd, 3rd, 4th+
     const pieData = [
         { name: '1st', value: wins, fill: '#ffd700' }, // Gold
         { name: '2nd', value: second, fill: '#c0c0c0' }, // Silver
@@ -90,15 +86,14 @@ export async function GET(
 
     return NextResponse.json({
       user,
+      group,
       totalGames,
       summary: { wins, second, third, last },
       pieData,
-      gamesData,
-      groups: userGroups.map(ug => ug.group)
+      gamesData
     })
 
   } catch {
     return NextResponse.json({ error: 'Failed to fetch statistics' }, { status: 500 })
   }
 }
-

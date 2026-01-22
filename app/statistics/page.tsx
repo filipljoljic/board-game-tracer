@@ -1,17 +1,26 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts'
+import useSWR from 'swr'
+import { StatsSummaryCards } from '@/components/stats-summary-cards'
+import { PlacementChart } from '@/components/placement-chart'
+import { GamesChart } from '@/components/games-chart'
+import { StatsSkeleton } from '@/components/stats-skeleton'
 
 interface User {
   id: string
   name: string
 }
 
+interface Group {
+  id: string
+  name: string
+}
+
 interface StatsData {
   user: User
+  group?: Group
   totalGames: number
   summary: {
     wins: number
@@ -21,40 +30,46 @@ interface StatsData {
   }
   pieData: { name: string; value: number; fill: string }[]
   gamesData: { name: string; played: number; wins: number; winRate: number }[]
+  groups?: Group[]
 }
+
+const fetcher = (url: string) => fetch(url).then(res => res.json())
 
 export default function StatisticsPage() {
   const [users, setUsers] = useState<User[]>([])
   const [selectedUserId, setSelectedUserId] = useState<string>('')
-  const [stats, setStats] = useState<StatsData | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState<string>('all')
 
+  // Fetch users list
   useEffect(() => {
     fetch('/api/users')
       .then(res => res.json())
       .then(data => {
-        // Ensure data is an array before setting
         const usersArray = Array.isArray(data) ? data : []
         setUsers(usersArray)
         if (usersArray.length > 0) {
-            setSelectedUserId(usersArray[0].id)
+          setSelectedUserId(usersArray[0].id)
         }
       })
       .catch(() => {
-        // Handle error - set empty array
         setUsers([])
       })
   }, [])
 
-  useEffect(() => {
-    if (selectedUserId) {
-      setLoading(true)
-      fetch(`/api/statistics/${selectedUserId}`)
-        .then(res => res.json())
-        .then(data => setStats(data))
-        .finally(() => setLoading(false))
-    }
-  }, [selectedUserId])
+  // Fetch overall statistics using SWR
+  const { data: stats, isLoading: isLoadingStats } = useSWR<StatsData>(
+    selectedUserId ? `/api/statistics/${selectedUserId}` : null,
+    fetcher
+  )
+
+  // Fetch group-specific statistics using SWR
+  const { data: groupStats, isLoading: isLoadingGroupStats } = useSWR<StatsData>(
+    selectedUserId && activeTab !== 'all' ? `/api/statistics/${selectedUserId}/groups/${activeTab}` : null,
+    fetcher
+  )
+
+  const displayStats = activeTab === 'all' ? stats : groupStats
+  const isLoading = activeTab === 'all' ? isLoadingStats : isLoadingGroupStats
 
   return (
     <main className="container mx-auto px-4 md:px-6 py-6 md:py-10 space-y-6 md:space-y-8">
@@ -74,102 +89,82 @@ export default function StatisticsPage() {
         </div>
       </div>
 
-      {loading && (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">Loading statistics...</p>
+      {/* Tabs for All Groups and Individual Groups */}
+      {stats?.groups && stats.groups.length > 0 && (
+        <div className="border-b border-border">
+          <nav className="flex gap-4 overflow-x-auto" aria-label="Statistics tabs">
+            <button
+              onClick={() => setActiveTab('all')}
+              className={`px-4 py-2 font-medium whitespace-nowrap border-b-2 transition-colors ${
+                activeTab === 'all'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              All Groups
+            </button>
+            {stats.groups.map(group => (
+              <button
+                key={group.id}
+                onClick={() => setActiveTab(group.id)}
+                className={`px-4 py-2 font-medium whitespace-nowrap border-b-2 transition-colors ${
+                  activeTab === group.id
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {group.name}
+              </button>
+            ))}
+          </nav>
         </div>
       )}
 
-      {!loading && !stats && users.length === 0 && (
+      {/* Loading State */}
+      {isLoading && (
+        <div className="py-4">
+          <StatsSkeleton />
+        </div>
+      )}
+
+      {/* Empty States */}
+      {!isLoading && !displayStats && users.length === 0 && (
         <div className="text-center py-10">
           <p className="text-muted-foreground">No users found. Create some users to view statistics.</p>
         </div>
       )}
 
-      {!loading && !stats && users.length > 0 && !selectedUserId && (
+      {!isLoading && !displayStats && users.length > 0 && !selectedUserId && (
         <div className="text-center py-10">
           <p className="text-muted-foreground">Select a player to view their statistics.</p>
         </div>
       )}
 
-      {stats && !loading && (
+      {!isLoading && displayStats && displayStats.totalGames === 0 && (
+        <div className="text-center py-10">
+          <p className="text-muted-foreground">
+            No games played yet {activeTab !== 'all' && displayStats.group ? `in ${displayStats.group.name}` : ''}.
+          </p>
+        </div>
+      )}
+
+      {/* Statistics Display */}
+      {displayStats && !isLoading && displayStats.totalGames > 0 && (
         <>
           {/* Summary Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card>
-              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Total Games</CardTitle></CardHeader>
-              <CardContent><div className="text-2xl font-bold">{stats.totalGames}</div></CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Wins (1st)</CardTitle></CardHeader>
-              <CardContent><div className="text-2xl font-bold text-yellow-600">{stats.summary.wins}</div></CardContent>
-            </Card>
-             <Card>
-              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Win Rate</CardTitle></CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                    {stats.totalGames > 0 ? Math.round((stats.summary.wins / stats.totalGames) * 100) : 0}%
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2"><CardTitle className="text-sm font-medium">Last Place</CardTitle></CardHeader>
-              <CardContent><div className="text-2xl font-bold text-red-600">{stats.summary.last}</div></CardContent>
-            </Card>
-          </div>
+          <StatsSummaryCards
+            totalGames={displayStats.totalGames}
+            wins={displayStats.summary.wins}
+            last={displayStats.summary.last}
+          />
 
+          {/* Charts */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Placement Pie Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Placement Distribution</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={stats.pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={80}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {stats.pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            {/* Games Bar Chart */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Games Played</CardTitle>
-              </CardHeader>
-              <CardContent className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stats.gamesData} layout="vertical" margin={{ left: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                    <XAxis type="number" hide />
-                    <YAxis dataKey="name" type="category" width={100} tick={{fontSize: 12}} />
-                    <Tooltip />
-                    <Legend />
-                    <Bar dataKey="played" name="Played" fill="#94a3b8" radius={[0, 4, 4, 0]} />
-                    <Bar dataKey="wins" name="Wins" fill="#ffd700" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
+            <PlacementChart data={displayStats.pieData} />
+            <GamesChart data={displayStats.gamesData} />
           </div>
         </>
       )}
     </main>
   )
 }
-
