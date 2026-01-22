@@ -121,6 +121,15 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  
+  // Search engine verification tags
+  // These prove to search engines that you own this site
+  verification: {
+    google: "nqYPJc63KaQFUSBrG7U4V9DbeTmoA2RojXUVgLMjyAU",
+    // Add other verifications here if needed:
+    // yandex: "verification-code",
+    // bing: "verification-code",
+  },
 };
 
 /**
