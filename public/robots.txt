@@ -1,0 +1,12 @@
+# Board Game Tracker - robots.txt
+# This file tells search engine crawlers which pages to access
+
+# Allow all crawlers to access all pages
+User-agent: *
+Allow: /
+
+# Block API routes from being indexed (they return JSON, not HTML)
+Disallow: /api/
+
+# Point crawlers to our sitemap
+Sitemap: https://www.board-game-tracker.com/sitemap.xml

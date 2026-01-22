@@ -5,6 +5,47 @@ import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
 import { GroupMembers } from '@/components/group-members'
 import { GroupHistory } from '@/components/group-history'
+import { Metadata } from 'next'
+
+/**
+ * Dynamic Metadata Generation
+ * 
+ * This function generates page-specific metadata for each group.
+ * Instead of generic "Group | Board Game Tracker", users see
+ * "Friday Night Gaming | Board Game Tracker" in search results.
+ * 
+ * Why this matters:
+ * - More relevant search results = higher click-through rate
+ * - Better social sharing previews
+ * - Search engines understand the page is about a specific group
+ */
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ groupId: string }> 
+}): Promise<Metadata> {
+  const { groupId } = await params
+  const group = await prisma.group.findUnique({ 
+    where: { id: groupId },
+    select: { name: true }
+  })
+
+  if (!group) {
+    return {
+      title: 'Group Not Found',
+      description: 'The requested group could not be found.',
+    }
+  }
+
+  return {
+    title: group.name,
+    description: `View the leaderboard, game sessions, and members of ${group.name}. Track scores and see who's winning!`,
+    openGraph: {
+      title: `${group.name} | Board Game Tracker`,
+      description: `View the leaderboard, game sessions, and members of ${group.name}.`,
+    },
+  }
+}
 
 export default async function GroupPage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params

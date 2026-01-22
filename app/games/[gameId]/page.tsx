@@ -4,6 +4,44 @@ import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
 import { prisma } from '@/lib/db'
 import { Plus, Edit } from 'lucide-react'
+import { Metadata } from 'next'
+
+/**
+ * Dynamic Metadata Generation for Game Detail Pages
+ * 
+ * Generates unique titles and descriptions for each game page.
+ * This helps with:
+ * - Search engine indexing (each game has unique metadata)
+ * - Social sharing (sharing Catan page shows "Catan" not "Game")
+ * - User experience in browser tabs
+ */
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ gameId: string }> 
+}): Promise<Metadata> {
+  const { gameId } = await params
+  const game = await prisma.game.findUnique({ 
+    where: { id: gameId },
+    select: { name: true, _count: { select: { templates: true, sessions: true } } }
+  })
+
+  if (!game) {
+    return {
+      title: 'Game Not Found',
+      description: 'The requested game could not be found.',
+    }
+  }
+
+  return {
+    title: game.name,
+    description: `Manage scoring templates for ${game.name}. ${game._count.templates} templates available, ${game._count.sessions} sessions played.`,
+    openGraph: {
+      title: `${game.name} | Board Game Tracker`,
+      description: `Manage scoring templates and view sessions for ${game.name}.`,
+    },
+  }
+}
 
 export default async function GameDetailsPage({ params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = await params

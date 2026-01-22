@@ -9,6 +9,60 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { Metadata } from 'next'
+
+/**
+ * Dynamic Metadata Generation for Session Pages
+ * 
+ * Creates descriptive titles showing the game name and date.
+ * Example: "Catan Session - Jan 21, 2026 | Board Game Tracker"
+ * 
+ * This helps users:
+ * - Quickly identify sessions in browser history
+ * - Share specific session results with meaningful previews
+ */
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: Promise<{ sessionId: string }> 
+}): Promise<Metadata> {
+  const { sessionId } = await params
+  const session = await prisma.session.findUnique({ 
+    where: { id: sessionId },
+    select: { 
+      playedAt: true,
+      game: { select: { name: true } },
+      group: { select: { name: true } },
+      players: { 
+        where: { placement: 1 },
+        select: { user: { select: { name: true, username: true } } }
+      }
+    }
+  })
+
+  if (!session) {
+    return {
+      title: 'Session Not Found',
+      description: 'The requested session could not be found.',
+    }
+  }
+
+  const dateStr = session.playedAt.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  })
+  const winner = session.players[0]?.user?.name || session.players[0]?.user?.username || 'Unknown'
+
+  return {
+    title: `${session.game.name} Session - ${dateStr}`,
+    description: `${session.game.name} session played on ${dateStr} in ${session.group.name}. Winner: ${winner}. View detailed scores and placements.`,
+    openGraph: {
+      title: `${session.game.name} Session Results | Board Game Tracker`,
+      description: `${session.game.name} played on ${dateStr}. Winner: ${winner}.`,
+    },
+  }
+}
 
 export default async function SessionPage({ params }: { params: Promise<{ sessionId: string }> }) {
   const { sessionId } = await params

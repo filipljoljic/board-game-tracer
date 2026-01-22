@@ -1,6 +1,19 @@
 import { RegisterForm } from '@/components/register-form'
 import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
+import { Metadata } from 'next'
+
+/**
+ * Register Page Metadata
+ * 
+ * The registration page is important for conversion:
+ * - Good title/description can improve sign-up rates from search
+ * - Clear value proposition in description
+ */
+export const metadata: Metadata = {
+  title: 'Create Account',
+  description: 'Create a free Board Game Tracker account. Track your game sessions, compete on leaderboards, and analyze your gaming performance.',
+}
 
 export default async function RegisterPage() {
   const session = await auth()
