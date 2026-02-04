@@ -49,8 +49,8 @@ export async function POST(request: Request) {
       data: { name },
     })
     
-    // Invalidate games cache for instant visibility
-    revalidateTag('games')
+    // Invalidate games cache for instant visibility (Next.js 15+ requires await)
+    await revalidateTag('games')
     
     return NextResponse.json(game)
   } catch {

@@ -55,7 +55,7 @@ export async function POST(
     })
 
     // Invalidate groups cache
-    revalidateTag('groups')
+    await revalidateTag('groups')
     
     return NextResponse.json(member.user)
 
@@ -85,7 +85,7 @@ export async function DELETE(
         })
         
         // Invalidate groups cache
-        revalidateTag('groups')
+        await revalidateTag('groups')
         
         return NextResponse.json({ success: true })
 
