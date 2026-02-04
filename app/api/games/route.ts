@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { auth } from '@/auth'
 
@@ -17,7 +18,13 @@ export async function GET() {
         },
       },
     })
-    return NextResponse.json(games)
+    
+    // Cache for 1 hour in browser, revalidate in background
+    return NextResponse.json(games, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+      }
+    })
   } catch {
     return NextResponse.json({ error: 'Failed to fetch games' }, { status: 500 })
   }
@@ -41,6 +48,10 @@ export async function POST(request: Request) {
     const game = await prisma.game.create({
       data: { name },
     })
+    
+    // Invalidate games cache for instant visibility
+    revalidateTag('games')
+    
     return NextResponse.json(game)
   } catch {
     return NextResponse.json({ error: 'Failed to create game' }, { status: 500 })

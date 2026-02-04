@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import useSWR from 'swr'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -10,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from 'sonner'
+import { useImmutableSWR } from '@/lib/swr'
 
 type Game = { id: string; name: string }
 type Group = { id: string; name: string }
@@ -29,12 +31,6 @@ export default function CreateSessionForm() {
   const [step, setStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
   
-  // Data
-  const [games, setGames] = useState<Game[]>([])
-  const [groups, setGroups] = useState<Group[]>([])
-  const [templates, setTemplates] = useState<Template[]>([])
-  const [groupMembers, setGroupMembers] = useState<User[]>([])
-  
   // Selection
   const [selectedGroupId, setSelectedGroupId] = useState<string>('')
   const [selectedGameId, setSelectedGameId] = useState<string>('')
@@ -44,34 +40,23 @@ export default function CreateSessionForm() {
   // Scoring
   const [playerScores, setPlayerScores] = useState<Record<string, PlayerScore>>({})
   
-  // Fetch initial data in parallel
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/groups').then(res => res.json()),
-      fetch('/api/games').then(res => res.json())
-    ]).then(([groupsData, gamesData]) => {
-      setGroups(groupsData)
-      setGames(gamesData)
-    })
-  }, [])
-
-  // Fetch members when group changes
-  useEffect(() => {
-    if (selectedGroupId) {
-      fetch(`/api/groups/${selectedGroupId}/members`).then(res => res.json()).then(setGroupMembers)
-    }
-  }, [selectedGroupId])
-
-  // Fetch templates when game changes
-  useEffect(() => {
-    if (selectedGameId) {
-      fetch(`/api/games/${selectedGameId}/templates`).then(res => res.json()).then(data => {
-        setTemplates(data)
-        if (data.length > 0) setSelectedTemplateId(data[0].id)
-        else setSelectedTemplateId('none')
-      })
-    }
-  }, [selectedGameId])
+  // Fetch initial data with SWR - games rarely change so use immutable
+  const { data: games = [] } = useImmutableSWR<Game[]>('/api/games')
+  const { data: groups = [] } = useSWR<Group[]>('/api/groups')
+  
+  // Conditionally fetch members and templates when selections change
+  const { data: groupMembers = [] } = useSWR<User[]>(
+    selectedGroupId ? `/api/groups/${selectedGroupId}/members` : null
+  )
+  
+  const { data: templates = [] } = useImmutableSWR<Template[]>(
+    selectedGameId ? `/api/games/${selectedGameId}/templates` : null
+  )
+  
+  // Auto-select first template when templates load
+  if (templates.length > 0 && selectedTemplateId === 'none' && selectedGameId) {
+    setSelectedTemplateId(templates[0].id)
+  }
 
   const handleStartScoring = () => {
     // Initialize scores

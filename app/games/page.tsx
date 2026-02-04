@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { prisma } from '@/lib/db'
+import { getCachedGames } from '@/lib/cache'
 import { CreateGameDialog } from '@/components/create-game-dialog'
 import { Metadata } from 'next'
 
@@ -10,13 +10,8 @@ export const metadata: Metadata = {
 }
 
 export default async function GamesPage() {
-  const games = await prisma.game.findMany({
-    include: {
-      _count: {
-        select: { templates: true, sessions: true },
-      },
-    },
-  })
+  // Use cached games query - cached for 1 hour, invalidated on game create/update
+  const games = await getCachedGames()
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
@@ -32,7 +27,7 @@ export default async function GamesPage() {
               <CardHeader>
                 <CardTitle>{game.name}</CardTitle>
                 <CardDescription>
-                  {game._count.templates} templates • {game._count.sessions} sessions
+                  {game._count.sessions} sessions
                 </CardDescription>
               </CardHeader>
             </Card>

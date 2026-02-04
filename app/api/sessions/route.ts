@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { auth } from '@/auth'
 
@@ -45,6 +46,12 @@ export async function POST(request: Request) {
       },
     })
 
+    // Invalidate caches for instant visibility
+    revalidateTag('sessions')
+    revalidateTag(`group-${groupId}-sessions`)
+    revalidateTag('statistics')
+    revalidateTag(`group-${groupId}-leaderboard`)
+
     return NextResponse.json(newSession)
   } catch {
     return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
@@ -72,7 +79,13 @@ export async function GET(request: Request) {
       },
       orderBy: { playedAt: 'desc' },
     })
-    return NextResponse.json(sessions)
+    
+    // Cache for 15 minutes
+    return NextResponse.json(sessions, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=900, stale-while-revalidate=1800'
+      }
+    })
   } catch {
     return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 })
   }

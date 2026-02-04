@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card'
-import { prisma } from '@/lib/db'
+import { getCachedGame, getGame } from '@/lib/cache'
 import { Plus, Edit } from 'lucide-react'
 import { Metadata } from 'next'
 
@@ -21,10 +21,8 @@ export async function generateMetadata({
   params: Promise<{ gameId: string }> 
 }): Promise<Metadata> {
   const { gameId } = await params
-  const game = await prisma.game.findUnique({ 
-    where: { id: gameId },
-    select: { name: true, _count: { select: { templates: true, sessions: true } } }
-  })
+  // Use React.cache for metadata generation (per-request deduplication)
+  const game = await getGame(gameId)
 
   if (!game) {
     return {
@@ -35,7 +33,7 @@ export async function generateMetadata({
 
   return {
     title: game.name,
-    description: `Manage scoring templates for ${game.name}. ${game._count.templates} templates available, ${game._count.sessions} sessions played.`,
+    description: `Manage scoring templates for ${game.name}. ${game.templates.length} templates available.`,
     openGraph: {
       title: `${game.name} | Board Game Tracker`,
       description: `Manage scoring templates and view sessions for ${game.name}.`,
@@ -45,12 +43,9 @@ export async function generateMetadata({
 
 export default async function GameDetailsPage({ params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = await params
-  const game = await prisma.game.findUnique({
-    where: { id: gameId },
-    include: {
-      templates: true,
-    },
-  })
+  // Use cached game query with React.cache for per-request deduplication
+  // This shares the query with generateMetadata above
+  const game = await getGame(gameId)
 
   if (!game) notFound()
 

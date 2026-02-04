@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 
 export async function GET(
@@ -35,6 +36,11 @@ export async function PUT(
         fields: fieldsString,
       },
     })
+    
+    // Invalidate games cache (templates are part of game details)
+    revalidateTag('games')
+    revalidateTag(`game-${template.gameId}`)
+    
     return NextResponse.json(template)
   } catch {
     return NextResponse.json({ error: 'Failed to update template' }, { status: 500 })
@@ -47,9 +53,14 @@ export async function DELETE(
 ) {
   const { templateId } = await params
   try {
-    await prisma.customScoreTemplate.delete({
+    const template = await prisma.customScoreTemplate.delete({
       where: { id: templateId },
     })
+    
+    // Invalidate games cache (templates are part of game details)
+    revalidateTag('games')
+    revalidateTag(`game-${template.gameId}`)
+    
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
