@@ -6,7 +6,7 @@ import { Calendar } from 'lucide-react'
 interface SessionHistory {
     id: string
     gameName: string
-    playedAt: Date
+    playedAt: Date | string  // Can be string when coming from cache
     winnerNames: string[]
 }
 
@@ -24,7 +24,7 @@ export function GroupHistory({ sessions }: { sessions: SessionHistory[] }) {
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{session.gameName}</p>
                   <p className="text-sm text-muted-foreground">
-                    {session.playedAt.toLocaleDateString()}
+                    {new Date(session.playedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="md:text-right flex-shrink-0">

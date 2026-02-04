@@ -7,13 +7,15 @@ import { CreateGroupDialog } from '@/components/create-group-dialog'
 export default async function Home() {
   const session = await auth()
   
-  const groups = await prisma.group.findMany({
-    where: {
-      members: {
-        some: { userId: session?.user?.id }
-      }
-    }
-  })
+  const groups = session?.user?.id 
+    ? await prisma.group.findMany({
+        where: {
+          members: {
+            some: { userId: session.user.id }
+          }
+        }
+      })
+    : []
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
