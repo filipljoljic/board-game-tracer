@@ -38,10 +38,8 @@ export async function PUT(
     })
     
     // Invalidate games cache (templates are part of game details)
-    await Promise.all([
-      revalidateTag('games'),
-      revalidateTag(`game-${template.gameId}`)
-    ])
+    revalidateTag('games', 'max')
+    revalidateTag(`game-${template.gameId}`, 'max')
     
     return NextResponse.json(template)
   } catch {
@@ -60,10 +58,8 @@ export async function DELETE(
     })
     
     // Invalidate games cache (templates are part of game details)
-    await Promise.all([
-      revalidateTag('games'),
-      revalidateTag(`game-${template.gameId}`)
-    ])
+    revalidateTag('games', 'max')
+    revalidateTag(`game-${template.gameId}`, 'max')
     
     return NextResponse.json({ success: true })
   } catch {

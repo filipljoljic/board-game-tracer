@@ -23,10 +23,8 @@ export async function POST(request: Request) {
     })
 
     // Invalidate games cache (templates are part of game details)
-    await Promise.all([
-      revalidateTag('games'),
-      revalidateTag(`game-${gameId}`)
-    ])
+    revalidateTag('games', 'max')
+    revalidateTag(`game-${gameId}`, 'max')
 
     return NextResponse.json(template)
   } catch {

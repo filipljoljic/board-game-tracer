@@ -46,13 +46,11 @@ export async function POST(request: Request) {
       },
     })
 
-    // Invalidate caches for instant visibility (parallel for performance)
-    await Promise.all([
-      revalidateTag('sessions'),
-      revalidateTag(`group-${groupId}-sessions`),
-      revalidateTag('statistics'),
-      revalidateTag(`group-${groupId}-leaderboard`)
-    ])
+    // Invalidate caches for instant visibility
+    revalidateTag('sessions', 'max')
+    revalidateTag(`group-${groupId}-sessions`, 'max')
+    revalidateTag('statistics', 'max')
+    revalidateTag(`group-${groupId}-leaderboard`, 'max')
 
     return NextResponse.json(newSession)
   } catch {
