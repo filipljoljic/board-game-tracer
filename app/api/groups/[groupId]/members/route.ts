@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 
 export async function GET(
@@ -11,7 +12,13 @@ export async function GET(
       where: { groupId },
       include: { user: true },
     })
-    return NextResponse.json(members.map((m) => m.user))
+    
+    // Cache for 30 minutes
+    return NextResponse.json(members.map((m) => m.user), {
+      headers: {
+        'Cache-Control': 'public, s-maxage=1800, stale-while-revalidate=3600'
+      }
+    })
   } catch {
     return NextResponse.json({ error: 'Failed to fetch group members' }, { status: 500 })
   }
@@ -47,6 +54,9 @@ export async function POST(
         include: { user: true }
     })
 
+    // Invalidate groups cache
+    revalidateTag('groups', 'max')
+    
     return NextResponse.json(member.user)
 
   } catch {
@@ -73,6 +83,9 @@ export async function DELETE(
                 userId
             }
         })
+        
+        // Invalidate groups cache
+        revalidateTag('groups', 'max')
         
         return NextResponse.json({ success: true })
 

@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import useSWR from 'swr'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,6 +18,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { fetcher } from '@/lib/swr'
 
 interface User {
   id: string
@@ -25,28 +27,9 @@ interface User {
 }
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
+  const { data: users = [], isLoading, mutate } = useSWR<User[]>('/api/users', fetcher)
   const [newName, setNewName] = useState('')
   const [newEmail, setNewEmail] = useState('')
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    fetchUsers()
-  }, [])
-
-  const fetchUsers = async () => {
-    try {
-      const res = await fetch('/api/users')
-      const data = await res.json()
-      // Ensure data is an array before setting
-      setUsers(Array.isArray(data) ? data : [])
-    } catch {
-      // Silently handle error - users will see empty list
-      setUsers([])
-    } finally {
-        setLoading(false)
-    }
-  }
 
   const addUser = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -62,7 +45,8 @@ export default function UsersPage() {
         setNewName('')
         setNewEmail('')
         toast.success('User added successfully')
-        fetchUsers()
+        // Revalidate SWR cache
+        mutate()
       } else {
         toast.error('Failed to add user', {
           description: 'Please try again or contact support'
@@ -82,7 +66,8 @@ export default function UsersPage() {
       })
       if (res.ok) {
         toast.success('User deleted successfully')
-        fetchUsers()
+        // Revalidate SWR cache
+        mutate()
       } else {
         const error = await res.json()
         toast.error(error.error || 'Failed to delete user', {
@@ -96,7 +81,7 @@ export default function UsersPage() {
     }
   }
 
-  if (loading) return <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">Loading...</div>
+  if (isLoading) return <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">Loading...</div>
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">

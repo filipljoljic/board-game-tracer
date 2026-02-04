@@ -5,6 +5,7 @@ import Header from "@/components/header";
 import { AuthProvider } from "@/components/auth-provider";
 import { Toaster } from "sonner";
 import { JsonLd } from "@/components/json-ld";
+import { SWRProvider } from "@/components/swr-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -184,9 +185,11 @@ export default function RootLayout({
         <JsonLd data={websiteJsonLd} />
         
         <AuthProvider>
-          <Header />
-          {children}
-          <Toaster richColors position="top-right" />
+          <SWRProvider>
+            <Header />
+            {children}
+            <Toaster richColors position="top-right" />
+          </SWRProvider>
         </AuthProvider>
       </body>
     </html>

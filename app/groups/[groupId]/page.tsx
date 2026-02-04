@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { GroupMembers } from '@/components/group-members'
 import { GroupHistory } from '@/components/group-history'
 import { Metadata } from 'next'
+import { getGroup, getCachedGroupLeaderboard, getCachedGroupSessions } from '@/lib/cache'
 
 /**
  * Dynamic Metadata Generation
@@ -25,10 +26,8 @@ export async function generateMetadata({
   params: Promise<{ groupId: string }> 
 }): Promise<Metadata> {
   const { groupId } = await params
-  const group = await prisma.group.findUnique({ 
-    where: { id: groupId },
-    select: { name: true }
-  })
+  // Use React.cache for metadata (per-request deduplication)
+  const group = await getGroup(groupId)
 
   if (!group) {
     return {
@@ -50,71 +49,55 @@ export async function generateMetadata({
 export default async function GroupPage({ params }: { params: Promise<{ groupId: string }> }) {
   const { groupId } = await params
   
-  const group = await prisma.group.findUnique({ where: { id: groupId } })
+  // Use React.cache for group details (shares with generateMetadata)
+  const group = await getGroup(groupId)
   if (!group) notFound()
 
-  // Leaderboard Data
-  const aggregation = await prisma.sessionPlayer.groupBy({
-    by: ['userId'],
-    where: { session: { groupId } },
-    _sum: { pointsAwarded: true },
-    _count: { sessionId: true },
-    _avg: { placement: true },
-  })
-
-  const userIds = aggregation.map((a) => a.userId)
-  const users = await prisma.user.findMany({ where: { id: { in: userIds } } })
-
-  const leaderboard = aggregation
-    .map((entry) => {
-      const user = users.find((u) => u.id === entry.userId)
-      return {
-        userId: entry.userId,
-        name: user?.name || user?.username || 'Unknown',
-        totalLeaguePoints: entry._sum.pointsAwarded || 0,
-        gamesPlayed: entry._count.sessionId || 0,
-        averagePlacement: entry._avg.placement || 0,
-      }
-    })
-    .sort((a, b) => b.totalLeaguePoints - a.totalLeaguePoints)
-
-  // Members Data
-  const members = await prisma.groupMember.findMany({
-    where: { groupId },
-    include: { 
-      user: {
-        select: {
-          id: true,
-          name: true,
-          username: true
+  // Fetch leaderboard, members, and sessions in parallel (Vercel best practice)
+  const [leaderboard, members, allUsers, sessions] = await Promise.all([
+    // Cached leaderboard (30 min TTL, invalidated on session create)
+    getCachedGroupLeaderboard(groupId),
+    
+    // Members data
+    prisma.groupMember.findMany({
+      where: { groupId },
+      include: { 
+        user: {
+          select: {
+            id: true,
+            name: true,
+            username: true
+          }
         }
       }
-    }
-  })
+    }),
+    
+    // All users for member management
+    prisma.user.findMany({ 
+      select: {
+        id: true,
+        name: true,
+        username: true
+      },
+      orderBy: { username: 'asc' } 
+    }),
+    
+    // Cached sessions (15 min TTL, invalidated on session create)
+    getCachedGroupSessions(groupId)
+  ])
+
   const memberUsers = members.map(m => m.user)
-  
-  const allUsers = await prisma.user.findMany({ 
-    select: {
-      id: true,
-      name: true,
-      username: true
-    },
-    orderBy: { username: 'asc' } 
-  })
 
-  // History Data
-  const sessions = await prisma.session.findMany({
-    where: { groupId },
-    orderBy: { playedAt: 'desc' },
-    include: {
-        game: true,
-        players: {
-            include: { user: true },
-            orderBy: { placement: 'asc' }
-        }
-    }
-  })
+  // Transform leaderboard data for component
+  const leaderboardData = leaderboard.map(entry => ({
+    userId: entry.userId,
+    name: entry.userName,
+    totalLeaguePoints: entry.totalPoints,
+    gamesPlayed: entry.gamesPlayed,
+    averagePlacement: entry.averagePlacement
+  }))
 
+  // Transform sessions for history component
   const history = sessions.map(session => {
     const winners = session.players.filter(p => p.placement === 1).map(p => p.user.name || p.user.username)
     return {
@@ -137,7 +120,7 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
         
         <section>
             <h2 className="text-xl font-semibold mb-4">Leaderboard</h2>
-            <LeaderboardTable data={leaderboard} />
+            <LeaderboardTable data={leaderboardData} />
         </section>
 
         <section>
