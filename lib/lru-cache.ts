@@ -14,7 +14,8 @@ import { LRUCache } from 'lru-cache'
  */
 
 // Cache configuration
-const cache = new LRUCache<string, unknown>({
+// Use `any` for value type to allow storing any kind of data
+const cache = new LRUCache<string, any>({
   max: 500, // Maximum 500 items
   ttl: 60 * 60 * 1000, // 1 hour TTL (in milliseconds)
   updateAgeOnGet: false, // Don't reset TTL on access
@@ -53,7 +54,7 @@ export async function getCachedOrFetch<T>(
  * @param key - Cache key
  * @param value - Value to cache
  */
-export function setCache(key: string, value: unknown): void {
+export function setCache(key: string, value: any): void {
   cache.set(key, value)
 }
 
