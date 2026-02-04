@@ -43,4 +43,4 @@ export function useImmutableSWR<T>(key: string | null) {
 }
 
 // Re-export SWR mutation for convenience
-export { useSWRMutation } from 'swr'
+export { default as useSWRMutation } from 'swr/mutation'
