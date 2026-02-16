@@ -13,16 +13,16 @@ declare module 'next-auth' {
       id: string
       name?: string | null
       email?: string | null
-      username: string
-      isAdmin: boolean
+      username?: string
+      isAdmin?: boolean
     }
   }
 }
 
 declare module 'next-auth/jwt' {
   interface JWT {
-    id: string
-    username: string
-    isAdmin: boolean
+    id?: string
+    username?: string
+    isAdmin?: boolean
   }
 }

@@ -69,8 +69,8 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.username = (user as { username?: string }).username
-        token.isAdmin = (user as { isAdmin?: boolean }).isAdmin
+        token.username = (user as { username?: string }).username || undefined
+        token.isAdmin = (user as { isAdmin?: boolean }).isAdmin ?? false
       }
       return token
     },
