@@ -1557,6 +1557,7 @@ export namespace Prisma {
     passwordHash: string | null
     name: string | null
     isGuest: boolean | null
+    isAdmin: boolean | null
     emailVerified: Date | null
     verificationToken: string | null
     verificationExpiry: Date | null
@@ -1571,6 +1572,7 @@ export namespace Prisma {
     passwordHash: string | null
     name: string | null
     isGuest: boolean | null
+    isAdmin: boolean | null
     emailVerified: Date | null
     verificationToken: string | null
     verificationExpiry: Date | null
@@ -1585,6 +1587,7 @@ export namespace Prisma {
     passwordHash: number
     name: number
     isGuest: number
+    isAdmin: number
     emailVerified: number
     verificationToken: number
     verificationExpiry: number
@@ -1601,6 +1604,7 @@ export namespace Prisma {
     passwordHash?: true
     name?: true
     isGuest?: true
+    isAdmin?: true
     emailVerified?: true
     verificationToken?: true
     verificationExpiry?: true
@@ -1615,6 +1619,7 @@ export namespace Prisma {
     passwordHash?: true
     name?: true
     isGuest?: true
+    isAdmin?: true
     emailVerified?: true
     verificationToken?: true
     verificationExpiry?: true
@@ -1629,6 +1634,7 @@ export namespace Prisma {
     passwordHash?: true
     name?: true
     isGuest?: true
+    isAdmin?: true
     emailVerified?: true
     verificationToken?: true
     verificationExpiry?: true
@@ -1716,6 +1722,7 @@ export namespace Prisma {
     passwordHash: string
     name: string | null
     isGuest: boolean
+    isAdmin: boolean
     emailVerified: Date | null
     verificationToken: string | null
     verificationExpiry: Date | null
@@ -1747,6 +1754,7 @@ export namespace Prisma {
     passwordHash?: boolean
     name?: boolean
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: boolean
     verificationToken?: boolean
     verificationExpiry?: boolean
@@ -1764,6 +1772,7 @@ export namespace Prisma {
     passwordHash?: boolean
     name?: boolean
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: boolean
     verificationToken?: boolean
     verificationExpiry?: boolean
@@ -1778,6 +1787,7 @@ export namespace Prisma {
     passwordHash?: boolean
     name?: boolean
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: boolean
     verificationToken?: boolean
     verificationExpiry?: boolean
@@ -1805,6 +1815,7 @@ export namespace Prisma {
       passwordHash: string
       name: string | null
       isGuest: boolean
+      isAdmin: boolean
       emailVerified: Date | null
       verificationToken: string | null
       verificationExpiry: Date | null
@@ -2211,6 +2222,7 @@ export namespace Prisma {
     readonly passwordHash: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly isGuest: FieldRef<"User", 'Boolean'>
+    readonly isAdmin: FieldRef<"User", 'Boolean'>
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly verificationToken: FieldRef<"User", 'String'>
     readonly verificationExpiry: FieldRef<"User", 'DateTime'>
@@ -8342,6 +8354,7 @@ export namespace Prisma {
     passwordHash: 'passwordHash',
     name: 'name',
     isGuest: 'isGuest',
+    isAdmin: 'isAdmin',
     emailVerified: 'emailVerified',
     verificationToken: 'verificationToken',
     verificationExpiry: 'verificationExpiry',
@@ -8517,6 +8530,7 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     isGuest?: BoolFilter<"User"> | boolean
+    isAdmin?: BoolFilter<"User"> | boolean
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     verificationToken?: StringNullableFilter<"User"> | string | null
     verificationExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
@@ -8533,6 +8547,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrderInput | SortOrder
     isGuest?: SortOrder
+    isAdmin?: SortOrder
     emailVerified?: SortOrderInput | SortOrder
     verificationToken?: SortOrderInput | SortOrder
     verificationExpiry?: SortOrderInput | SortOrder
@@ -8553,6 +8568,7 @@ export namespace Prisma {
     passwordHash?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     isGuest?: BoolFilter<"User"> | boolean
+    isAdmin?: BoolFilter<"User"> | boolean
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     verificationExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
@@ -8568,6 +8584,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrderInput | SortOrder
     isGuest?: SortOrder
+    isAdmin?: SortOrder
     emailVerified?: SortOrderInput | SortOrder
     verificationToken?: SortOrderInput | SortOrder
     verificationExpiry?: SortOrderInput | SortOrder
@@ -8588,6 +8605,7 @@ export namespace Prisma {
     passwordHash?: StringWithAggregatesFilter<"User"> | string
     name?: StringNullableWithAggregatesFilter<"User"> | string | null
     isGuest?: BoolWithAggregatesFilter<"User"> | boolean
+    isAdmin?: BoolWithAggregatesFilter<"User"> | boolean
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     verificationToken?: StringNullableWithAggregatesFilter<"User"> | string | null
     verificationExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -8928,6 +8946,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -8944,6 +8963,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -8960,6 +8980,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8976,6 +8997,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -8992,6 +9014,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -9006,6 +9029,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9020,6 +9044,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -9426,6 +9451,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrder
     isGuest?: SortOrder
+    isAdmin?: SortOrder
     emailVerified?: SortOrder
     verificationToken?: SortOrder
     verificationExpiry?: SortOrder
@@ -9440,6 +9466,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrder
     isGuest?: SortOrder
+    isAdmin?: SortOrder
     emailVerified?: SortOrder
     verificationToken?: SortOrder
     verificationExpiry?: SortOrder
@@ -9454,6 +9481,7 @@ export namespace Prisma {
     passwordHash?: SortOrder
     name?: SortOrder
     isGuest?: SortOrder
+    isAdmin?: SortOrder
     emailVerified?: SortOrder
     verificationToken?: SortOrder
     verificationExpiry?: SortOrder
@@ -10666,6 +10694,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -10681,6 +10710,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -10735,6 +10765,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10750,6 +10781,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11128,6 +11160,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -11143,6 +11176,7 @@ export namespace Prisma {
     passwordHash: string
     name?: string | null
     isGuest?: boolean
+    isAdmin?: boolean
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
@@ -11201,6 +11235,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -11216,6 +11251,7 @@ export namespace Prisma {
     passwordHash?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     isGuest?: BoolFieldUpdateOperationsInput | boolean
+    isAdmin?: BoolFieldUpdateOperationsInput | boolean
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

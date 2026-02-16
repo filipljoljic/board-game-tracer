@@ -24,7 +24,9 @@ export default function Header() {
             <nav className="hidden md:flex items-center space-x-4 text-sm font-medium">
               <Link href="/" className="hover:text-primary">Groups</Link>
               <Link href="/games" className="hover:text-primary">Games</Link>
-              <Link href="/users" className="hover:text-primary">Users</Link>
+              {session?.user && (session.user as { isAdmin?: boolean }).isAdmin && (
+                <Link href="/users" className="hover:text-primary">Users</Link>
+              )}
               <Link href="/statistics" className="hover:text-primary">Statistics</Link>
               <RandomizerDialog />
             </nav>
@@ -82,9 +84,11 @@ export default function Header() {
               <Link href="/games" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
                 Games
               </Link>
-              <Link href="/users" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
-                Users
-              </Link>
+              {session?.user && (session.user as { isAdmin?: boolean }).isAdmin && (
+                <Link href="/users" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
+                  Users
+                </Link>
+              )}
               <Link href="/statistics" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
                 Statistics
               </Link>

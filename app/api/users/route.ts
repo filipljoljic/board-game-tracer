@@ -11,7 +11,48 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Check if user is admin
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { isAdmin: true }
+    })
+
+    // If admin, return all users
+    if (currentUser?.isAdmin) {
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          username: true,
+          name: true,
+          email: true,
+          isGuest: true,
+          createdAt: true
+        },
+        orderBy: { createdAt: 'desc' }
+      })
+      return NextResponse.json(users)
+    }
+
+    // For non-admins, return only users in shared groups + self
     const users = await prisma.user.findMany({
+      where: {
+        OR: [
+          { id: session.user.id }, // Include self
+          {
+            groups: {
+              some: {
+                group: {
+                  members: {
+                    some: {
+                      userId: session.user.id // In a group with current user
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
       select: {
         id: true,
         username: true,
@@ -37,6 +78,16 @@ export async function POST(request: Request) {
     
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check if user is admin
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { isAdmin: true }
+    })
+
+    if (!currentUser?.isAdmin) {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 })
     }
 
     const body = await request.json()

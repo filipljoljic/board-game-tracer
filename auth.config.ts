@@ -54,6 +54,15 @@ export const authConfig: NextAuthConfig = {
       if (!isLoggedIn) {
         return false // Redirects to /login
       }
+
+      // Admin-only routes
+      const isOnUsersPage = nextUrl.pathname.startsWith('/users')
+      if (isOnUsersPage) {
+        const isAdmin = auth?.user && (auth.user as { isAdmin?: boolean }).isAdmin
+        if (!isAdmin) {
+          return Response.redirect(new URL('/', nextUrl))
+        }
+      }
       
       return true
     },
@@ -61,13 +70,15 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.id = user.id
         token.username = (user as { username?: string }).username
+        token.isAdmin = (user as { isAdmin?: boolean }).isAdmin
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
-        (session.user as { username?: string }).username = token.username as string
+        (session.user as { username?: string; isAdmin?: boolean }).username = token.username as string;
+        (session.user as { username?: string; isAdmin?: boolean }).isAdmin = token.isAdmin as boolean
       }
       return session
     }
