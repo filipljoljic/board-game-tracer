@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { UserMenu } from '@/components/user-menu'
 import { RandomizerDialog } from '@/components/randomizer-dialog'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, Users, Gamepad2, BarChart3 } from 'lucide-react'
 
 export default function Header() {
   const { data: session, status } = useSession()
@@ -19,15 +19,24 @@ export default function Header() {
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <Link href="/" className="text-xl font-bold">
-              BoardTracker
+              Game Tracker
             </Link>
             <nav className="hidden md:flex items-center space-x-4 text-sm font-medium">
-              <Link href="/" className="hover:text-primary">Groups</Link>
-              <Link href="/games" className="hover:text-primary">Games</Link>
+              <Link href="/" className="hover:text-primary flex items-center gap-1.5">
+                <Users className="h-4 w-4" />
+                Groups
+              </Link>
+              <Link href="/games" className="hover:text-primary flex items-center gap-1.5">
+                <Gamepad2 className="h-4 w-4" />
+                Games
+              </Link>
               {session?.user && (session.user as { isAdmin?: boolean }).isAdmin && (
                 <Link href="/users" className="hover:text-primary">Users</Link>
               )}
-              <Link href="/statistics" className="hover:text-primary">Statistics</Link>
+              <Link href="/statistics" className="hover:text-primary flex items-center gap-1.5">
+                <BarChart3 className="h-4 w-4" />
+                Statistics
+              </Link>
               <RandomizerDialog />
             </nav>
           </div>
@@ -78,10 +87,12 @@ export default function Header() {
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 border-t pt-4 space-y-3">
             <nav className="flex flex-col space-y-3 text-sm font-medium">
-              <Link href="/" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/" className="hover:text-primary py-2 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                <Users className="h-4 w-4" />
                 Groups
               </Link>
-              <Link href="/games" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/games" className="hover:text-primary py-2 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                <Gamepad2 className="h-4 w-4" />
                 Games
               </Link>
               {session?.user && (session.user as { isAdmin?: boolean }).isAdmin && (
@@ -89,7 +100,8 @@ export default function Header() {
                   Users
                 </Link>
               )}
-              <Link href="/statistics" className="hover:text-primary py-2" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/statistics" className="hover:text-primary py-2 flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+                <BarChart3 className="h-4 w-4" />
                 Statistics
               </Link>
               <div className="py-2">

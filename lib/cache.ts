@@ -213,3 +213,158 @@ export const getCachedGroupSessions = (groupId: string) => unstable_cache(
     tags: ['sessions', `group-${groupId}-sessions`]
   }
 )()
+
+/**
+ * Get user's quick stats for home page dashboard
+ * Cached for 30 min, instantly invalidated via 'statistics' tag
+ */
+export const getUserQuickStats = (userId: string) => unstable_cache(
+  async () => {
+    // Get all user's session players
+    const sessionPlayers = await prisma.sessionPlayer.findMany({
+      where: { userId },
+      include: {
+        session: {
+          include: { game: true }
+        }
+      }
+    })
+
+    const totalSessions = sessionPlayers.length
+    const wins = sessionPlayers.filter(sp => sp.placement === 1).length
+    const winRate = totalSessions > 0 ? Math.round((wins / totalSessions) * 100) : 0
+
+    // Find most played game
+    const gamePlayCounts = sessionPlayers.reduce((acc, sp) => {
+      const gameId = sp.session.gameId
+      const gameName = sp.session.game.name
+      if (!acc[gameId]) {
+        acc[gameId] = { name: gameName, count: 0 }
+      }
+      acc[gameId].count++
+      return acc
+    }, {} as Record<string, { name: string; count: number }>)
+
+    const mostPlayedGame = Object.values(gamePlayCounts).sort((a, b) => b.count - a.count)[0]?.name || 'N/A'
+
+    return {
+      totalSessions,
+      wins,
+      winRate,
+      mostPlayedGame
+    }
+  },
+  [`user-quick-stats-${userId}`],
+  {
+    revalidate: 1800, // 30 min
+    tags: ['statistics', `user-${userId}-stats`]
+  }
+)()
+
+/**
+ * Get enriched user groups with member counts, session counts, last session, and leader
+ * Cached for 30 min, instantly invalidated via 'groups' tag
+ */
+export const getEnrichedUserGroups = (userId: string) => unstable_cache(
+  async () => {
+    const groups = await prisma.group.findMany({
+      where: {
+        members: {
+          some: { userId }
+        }
+      },
+      include: {
+        _count: {
+          select: { 
+            members: true,
+            sessions: true 
+          }
+        }
+      },
+      orderBy: { name: 'asc' }
+    })
+
+    // For each group, get the last session and current leader
+    const enrichedGroups = await Promise.all(
+      groups.map(async (group) => {
+        // Get last session
+        const lastSession = await prisma.session.findFirst({
+          where: { groupId: group.id },
+          orderBy: { playedAt: 'desc' },
+          select: { playedAt: true }
+        })
+
+        // Get leaderboard to find leader
+        const leaderboard = await prisma.sessionPlayer.groupBy({
+          by: ['userId'],
+          where: {
+            session: { groupId: group.id }
+          },
+          _sum: {
+            pointsAwarded: true
+          }
+        })
+
+        const topPlayer = leaderboard.sort((a, b) => 
+          (b._sum.pointsAwarded || 0) - (a._sum.pointsAwarded || 0)
+        )[0]
+
+        const leaderName = topPlayer ? await prisma.user.findUnique({
+          where: { id: topPlayer.userId },
+          select: { name: true, username: true }
+        }).then(u => u?.name || u?.username || 'Unknown') : null
+
+        return {
+          ...group,
+          lastPlayedAt: lastSession?.playedAt || null,
+          leaderName: leaderName
+        }
+      })
+    )
+
+    return enrichedGroups
+  },
+  [`user-enriched-groups-${userId}`],
+  {
+    revalidate: 1800, // 30 min
+    tags: ['groups', `user-${userId}-groups`, 'statistics']
+  }
+)()
+
+/**
+ * Get recent sessions across all user's groups
+ * Cached for 15 min, instantly invalidated via 'sessions' tag
+ */
+export const getCachedRecentUserSessions = (userId: string) => unstable_cache(
+  async () => {
+    // Get all groups the user is a member of
+    const userGroups = await prisma.groupMember.findMany({
+      where: { userId },
+      select: { groupId: true }
+    })
+
+    const groupIds = userGroups.map(g => g.groupId)
+
+    // Get recent sessions from those groups
+    return await prisma.session.findMany({
+      where: {
+        groupId: { in: groupIds }
+      },
+      include: {
+        game: true,
+        group: true,
+        players: {
+          include: { user: true },
+          orderBy: { placement: 'asc' }
+        }
+      },
+      orderBy: { playedAt: 'desc' },
+      take: 10
+    })
+  },
+  [`user-recent-sessions-${userId}`],
+  {
+    revalidate: 900, // 15 min
+    tags: ['sessions', `user-${userId}-sessions`]
+  }
+)()
