@@ -2,9 +2,9 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Trophy, Calendar } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import type { Session, Game, Group, SessionPlayer, User } from '@prisma/client'
+import type { Session as PrismaSession, Game, Group, SessionPlayer, User } from '@/lib/prisma'
 
-type RecentSession = Session & {
+type RecentSession = PrismaSession & {
   game: Game
   group: Group
   players: (SessionPlayer & { user: User })[]

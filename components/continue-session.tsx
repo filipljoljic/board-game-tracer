@@ -3,9 +3,9 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Trophy, Medal, Award } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
-import type { Session, Game, Group, SessionPlayer, User } from '@prisma/client'
+import type { Session as PrismaSession, Game, Group, SessionPlayer, User } from '@/lib/prisma'
 
-type LastSession = Session & {
+type LastSession = PrismaSession & {
   game: Game
   group: Group
   players: (SessionPlayer & { user: User })[]
