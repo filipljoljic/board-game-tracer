@@ -1,4 +1,6 @@
 ---
+engine: claude
+
 on:
   check_run:
     types: [completed]

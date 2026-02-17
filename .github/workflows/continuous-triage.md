@@ -1,4 +1,6 @@
 ---
+engine: claude
+
 on:
   issues:
     types: [opened]

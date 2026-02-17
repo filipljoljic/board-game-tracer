@@ -1,4 +1,6 @@
 ---
+engine: claude
+
 on:
   pull_request:
     types: [closed]
