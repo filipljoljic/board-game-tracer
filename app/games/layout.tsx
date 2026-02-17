@@ -3,11 +3,11 @@ import { redirect } from 'next/navigation'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Player Statistics',
-  description: 'View detailed statistics, win rates, and performance analytics for players'
+  title: 'Games',
+  description: 'View and manage your board game collection and score templates'
 }
 
-export default async function StatisticsLayout({
+export default async function GamesLayout({
   children,
 }: {
   children: React.ReactNode

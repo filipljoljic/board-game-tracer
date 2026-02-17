@@ -2,12 +2,6 @@ import Link from 'next/link'
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { getCachedGames } from '@/lib/cache'
 import { CreateGameDialog } from '@/components/create-game-dialog'
-import { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'Manage Games | Board Game Tracker',
-  description: 'View and manage your board game collection and score templates'
-}
 
 export default async function GamesPage() {
   // Use cached games query - cached for 1 hour, invalidated on game create/update

@@ -25,16 +25,17 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
+      const { pathname } = nextUrl
       
       // Public routes that don't require authentication
       const isOnAuthPage = 
-        nextUrl.pathname === '/login' || 
-        nextUrl.pathname === '/register' ||
-        nextUrl.pathname === '/check-email' ||
-        nextUrl.pathname === '/verify-email'
+        pathname === '/login' || 
+        pathname === '/register' ||
+        pathname === '/check-email' ||
+        pathname === '/verify-email'
       
       // NextAuth API routes must always be accessible for auth to work
-      const isAuthApiRoute = nextUrl.pathname.startsWith('/api/auth')
+      const isAuthApiRoute = pathname.startsWith('/api/auth')
 
       // Allow auth API routes for everyone (required for NextAuth)
       if (isAuthApiRoute) {
@@ -44,7 +45,7 @@ export const authConfig: NextAuthConfig = {
       // Allow auth pages for unauthenticated users
       if (isOnAuthPage) {
         // Redirect logged-in users away from auth pages (except verification pages)
-        if (isLoggedIn && (nextUrl.pathname === '/login' || nextUrl.pathname === '/register')) {
+        if (isLoggedIn && (pathname === '/login' || pathname === '/register')) {
           return Response.redirect(new URL('/', nextUrl))
         }
         return true
@@ -56,7 +57,7 @@ export const authConfig: NextAuthConfig = {
       }
 
       // Admin-only routes
-      const isOnUsersPage = nextUrl.pathname.startsWith('/users')
+      const isOnUsersPage = pathname.startsWith('/users')
       if (isOnUsersPage) {
         const isAdmin = auth?.user && (auth.user as { isAdmin?: boolean }).isAdmin
         if (!isAdmin) {

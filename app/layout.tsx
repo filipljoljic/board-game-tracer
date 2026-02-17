@@ -57,11 +57,8 @@ export const metadata: Metadata = {
   authors: [{ name: "Board Game Tracker" }],
   creator: "Board Game Tracker",
   
-  // Canonical URL - prevents duplicate content issues
+  // Base URL for resolving relative metadata URLs (canonical, OG images, etc.)
   metadataBase: new URL(BASE_URL),
-  alternates: {
-    canonical: "/",
-  },
   
   // Open Graph - Controls how links appear on Facebook, Discord, Slack, etc.
   openGraph: {
