@@ -56,4 +56,5 @@ cursor/
 .cursor/
 .claude/
 .agents/
-.github/
+.github/*
+!.github/workflows/
