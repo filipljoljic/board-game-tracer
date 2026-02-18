@@ -2,9 +2,6 @@ import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
-// Set test database URL BEFORE any imports
-process.env.DATABASE_URL = 'file:./prisma/test.db'
-
 export default defineConfig({
   plugins: [react()],
   test: {

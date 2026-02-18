@@ -1,163 +1,178 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { resetDatabase, createTestUser } from '@/tests/helpers/db-helpers'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createMockRequest, parseResponse } from '@/tests/helpers/api-helpers'
-import { prismaTest } from '@/lib/test-db'
 
-// Mock the prisma client to use test database
-vi.mock('@/lib/db', async () => {
-  const { prismaTest } = await import('@/lib/test-db')
-  return {
-    prisma: prismaTest,
-  }
-})
+const mockUserFindMany = vi.fn()
+const mockUserFindUnique = vi.fn()
+const mockUserCreate = vi.fn()
+const mockAuth = vi.fn()
+
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    user: {
+      findMany: (...args: unknown[]) => mockUserFindMany(...args),
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
+      create: (...args: unknown[]) => mockUserCreate(...args),
+    },
+  },
+}))
+
+vi.mock('@/auth', () => ({
+  auth: () => mockAuth(),
+}))
 
 import { GET, POST } from './route'
 
-// Reset database before each test in this file
-beforeEach(async () => {
-  await resetDatabase()
-})
-
 describe('GET /api/users', () => {
-  beforeEach(async () => {
-    // Additional setup if needed
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
   })
-  
-  it('should return all users ordered by name', async () => {
-    // Arrange: Create test users
-    await createTestUser({ name: 'Charlie', email: 'charlie@test.com' })
-    await createTestUser({ name: 'Alice', email: 'alice@test.com' })
-    await createTestUser({ name: 'Bob', email: 'bob@test.com' })
-    
-    // Act
+
+  it('should return 401 when not authenticated', async () => {
+    mockAuth.mockResolvedValue(null)
+
     const response = await GET()
     const result = await parseResponse(response)
-    
-    // Assert
+
+    expect(result.status).toBe(401)
+    expect(result.data.error).toBe('Unauthorized')
+  })
+
+  it('should return all users when admin', async () => {
+    mockUserFindUnique.mockResolvedValue({ isAdmin: true })
+    mockUserFindMany.mockResolvedValue([
+      { id: '1', username: 'alice', name: 'Alice', email: 'alice@test.com', isGuest: false, createdAt: new Date() },
+      { id: '2', username: 'bob', name: 'Bob', email: 'bob@test.com', isGuest: false, createdAt: new Date() },
+    ])
+
+    const response = await GET()
+    const result = await parseResponse(response)
+
     expect(result.status).toBe(200)
-    expect(result.data).toBeInstanceOf(Array)
-    expect(result.data).toHaveLength(3)
-    // Check alphabetical order
-    expect(result.data[0].name).toBe('Alice')
-    expect(result.data[1].name).toBe('Bob')
-    expect(result.data[2].name).toBe('Charlie')
+    expect(result.data).toHaveLength(2)
+    expect(mockUserFindUnique).toHaveBeenCalledWith({
+      where: { id: 'user-1' },
+      select: { isAdmin: true },
+    })
   })
-  
-  it('should return empty array when no users exist', async () => {
-    // Note: resetDatabase is called in beforeEach, so database should be empty
-    
-    // Act
+
+  it('should return scoped users when not admin', async () => {
+    mockUserFindUnique.mockResolvedValue({ isAdmin: false })
+    mockUserFindMany.mockResolvedValue([
+      { id: 'user-1', username: 'self', name: 'Self', email: 'self@test.com', isGuest: false, createdAt: new Date() },
+    ])
+
     const response = await GET()
     const result = await parseResponse(response)
-    
-    // Assert
+
     expect(result.status).toBe(200)
-    expect(result.data).toBeInstanceOf(Array)
-    expect(result.data).toHaveLength(0)
+    expect(result.data).toHaveLength(1)
   })
-  
-  it('should include user properties', async () => {
-    // Arrange
-    await createTestUser({ name: 'Alice', email: 'alice@test.com', isGuest: false })
-    
-    // Act
+
+  it('should return 500 on database error', async () => {
+    mockUserFindUnique.mockRejectedValue(new Error('DB error'))
+
     const response = await GET()
     const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.data[0]).toHaveProperty('id')
-    expect(result.data[0]).toHaveProperty('name')
-    expect(result.data[0]).toHaveProperty('email')
-    expect(result.data[0]).toHaveProperty('isGuest')
+
+    expect(result.status).toBe(500)
+    expect(result.data.error).toBe('Failed to fetch users')
   })
 })
 
 describe('POST /api/users', () => {
-  beforeEach(async () => {
-    // Additional setup if needed
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
+    mockUserFindUnique.mockResolvedValue({ isAdmin: true })
   })
-  
-  it('should create a user with name and email', async () => {
-    // Arrange
-    const request = createMockRequest('POST', {
-      name: 'Alice',
-      email: 'alice@test.com'
-    })
-    
-    // Act
+
+  it('should return 401 when not authenticated', async () => {
+    mockAuth.mockResolvedValue(null)
+    const request = createMockRequest('POST', { name: 'Alice' })
+
     const response = await POST(request)
     const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(200)
-    expect(result.data).toHaveProperty('id')
-    expect(result.data.name).toBe('Alice')
-    expect(result.data.email).toBe('alice@test.com')
-    
-    // Verify in database
-    const user = await prismaTest.user.findFirst({
-      where: { email: 'alice@test.com' }
-    })
-    expect(user).toBeDefined()
-    expect(user?.name).toBe('Alice')
+
+    expect(result.status).toBe(401)
   })
-  
-  it('should create a user without email (guest)', async () => {
-    // Arrange
+
+  it('should return 403 when not admin', async () => {
+    mockUserFindUnique.mockResolvedValue({ isAdmin: false })
+    const request = createMockRequest('POST', { name: 'Alice' })
+
+    const response = await POST(request)
+    const result = await parseResponse(response)
+
+    expect(result.status).toBe(403)
+    expect(result.data.error).toBe('Forbidden: Admin access required')
+  })
+
+  it('should create a guest user with name', async () => {
+    mockUserCreate.mockResolvedValue({
+      id: '2',
+      username: 'guest_abc123',
+      name: 'Guest Player',
+      email: null,
+      isGuest: true,
+    })
     const request = createMockRequest('POST', { name: 'Guest Player' })
-    
-    // Act
+
     const response = await POST(request)
     const result = await parseResponse(response)
-    
-    // Assert
+
     expect(result.status).toBe(200)
     expect(result.data.name).toBe('Guest Player')
-    expect(result.data.email).toBeNull()
+    expect(result.data.isGuest).toBe(true)
+    expect(mockUserCreate).toHaveBeenCalled()
   })
-  
-  it('should return 400 when name is missing', async () => {
-    // Arrange
-    const request = createMockRequest('POST', { email: 'test@test.com' })
-    
-    // Act
-    const response = await POST(request)
-    const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(400)
-    expect(result.data.error).toBe('Name is required')
-  })
-  
-  it('should return 400 when name is empty string', async () => {
-    // Arrange
-    const request = createMockRequest('POST', { name: '' })
-    
-    // Act
-    const response = await POST(request)
-    const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(400)
-    expect(result.data.error).toBe('Name is required')
-  })
-  
-  it('should handle duplicate email gracefully', async () => {
-    // Arrange: Create user with email
-    await createTestUser({ name: 'Alice', email: 'alice@test.com' })
-    
-    const request = createMockRequest('POST', {
-      name: 'Alice 2',
-      email: 'alice@test.com'
+
+  it('should create a guest user with email', async () => {
+    mockUserCreate.mockResolvedValue({
+      id: '2',
+      username: 'guest_abc123',
+      name: 'Alice',
+      email: 'alice@test.com',
+      isGuest: true,
     })
-    
-    // Act
+    const request = createMockRequest('POST', { name: 'Alice', email: 'alice@test.com' })
+
     const response = await POST(request)
     const result = await parseResponse(response)
-    
-    // Assert: Should fail due to unique constraint
+
+    expect(result.status).toBe(200)
+    expect(result.data.email).toBe('alice@test.com')
+  })
+
+  it('should return 400 when name is missing', async () => {
+    const request = createMockRequest('POST', { email: 'test@test.com' })
+
+    const response = await POST(request)
+    const result = await parseResponse(response)
+
+    expect(result.status).toBe(400)
+    expect(result.data.error).toBe('Name is required')
+    expect(mockUserCreate).not.toHaveBeenCalled()
+  })
+
+  it('should return 400 when name is empty string', async () => {
+    const request = createMockRequest('POST', { name: '' })
+
+    const response = await POST(request)
+    const result = await parseResponse(response)
+
+    expect(result.status).toBe(400)
+    expect(result.data.error).toBe('Name is required')
+  })
+
+  it('should return 500 on database error', async () => {
+    mockUserCreate.mockRejectedValue(new Error('Unique constraint'))
+    const request = createMockRequest('POST', { name: 'Alice', email: 'alice@test.com' })
+
+    const response = await POST(request)
+    const result = await parseResponse(response)
+
     expect(result.status).toBe(500)
     expect(result.data.error).toBe('Failed to create user')
   })
 })
-

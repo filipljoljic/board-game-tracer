@@ -1,14 +1,11 @@
 import '@testing-library/jest-dom'
 import { cleanup } from '@testing-library/react'
-import { afterEach, afterAll, vi } from 'vitest'
-import { resetDatabase } from './helpers/db-helpers'
+import { afterEach, vi } from 'vitest'
 
-// Cleanup after each test case (e.g., clearing jsdom)
 afterEach(() => {
   cleanup()
 })
 
-// Mock Next.js router
 vi.mock('next/navigation', () => ({
   useRouter() {
     return {
@@ -29,13 +26,3 @@ vi.mock('next/navigation', () => ({
     return new URLSearchParams()
   },
 }))
-
-// Mock environment variables - set before any imports
-process.env.DATABASE_URL = 'file:./prisma/test.db'
-// NODE_ENV is set by vitest automatically
-
-// Cleanup after all tests
-afterAll(async () => {
-  await resetDatabase()
-})
-
