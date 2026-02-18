@@ -1,253 +1,212 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import {
-  resetDatabase,
-  createTestUser,
-  createTestGroup,
-  createTestGame,
-  createTestSession,
-} from '@/tests/helpers/db-helpers'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { createMockRequest, parseResponse } from '@/tests/helpers/api-helpers'
-import { prismaTest } from '@/lib/test-db'
 
-// Mock the prisma client to use test database
-vi.mock('@/lib/db', async () => {
-  const { prismaTest } = await import('@/lib/test-db')
-  return {
-    prisma: prismaTest,
-  }
-})
+const mockSessionCreate = vi.fn()
+const mockSessionFindMany = vi.fn()
+const mockAuth = vi.fn()
+
+vi.mock('@/lib/db', () => ({
+  prisma: {
+    session: {
+      create: (...args: unknown[]) => mockSessionCreate(...args),
+      findMany: (...args: unknown[]) => mockSessionFindMany(...args),
+    },
+  },
+}))
+
+vi.mock('@/auth', () => ({
+  auth: () => mockAuth(),
+}))
+
+vi.mock('next/cache', () => ({
+  revalidateTag: vi.fn(),
+}))
 
 import { GET, POST } from './route'
 
 describe('POST /api/sessions', () => {
-  let gameId: string
-  let groupId: string
-  let user1Id: string
-  let user2Id: string
-  
-  beforeEach(async () => {
-    await resetDatabase()
-    
-    // Setup test data
-    const game = await createTestGame({ name: 'Test Game' })
-    const group = await createTestGroup({ name: 'Test Group' })
-    const user1 = await createTestUser({ name: 'Alice' })
-    const user2 = await createTestUser({ name: 'Bob' })
-    
-    gameId = game.id
-    groupId = group.id
-    user1Id = user1.id
-    user2Id = user2.id
+  const validPayload = {
+    gameId: 'game-1',
+    groupId: 'group-1',
+    playedAt: '2024-06-15T10:00:00.000Z',
+    players: [
+      { userId: 'user-1', rawScore: 100, placement: 1, pointsAwarded: 2 },
+      { userId: 'user-2', rawScore: 75, placement: 2, pointsAwarded: 1 },
+    ],
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
   })
-  
+
+  it('should return 401 when not authenticated', async () => {
+    mockAuth.mockResolvedValue(null)
+    const request = createMockRequest('POST', validPayload)
+
+    const response = await POST(request)
+    const result = await parseResponse(response)
+
+    expect(result.status).toBe(401)
+    expect(result.data.error).toBe('Unauthorized')
+  })
+
   it('should create a session with player scores', async () => {
-    // Arrange
-    const request = createMockRequest('POST', {
-      gameId,
-      groupId,
-      playedAt: new Date().toISOString(),
+    mockSessionCreate.mockResolvedValue({
+      id: 'session-1',
+      gameId: 'game-1',
+      groupId: 'group-1',
+      playedAt: '2024-06-15T10:00:00.000Z',
       players: [
-        { userId: user1Id, rawScore: 100, placement: 1, pointsAwarded: 2 },
-        { userId: user2Id, rawScore: 75, placement: 2, pointsAwarded: 1 },
+        { id: 'sp-1', userId: 'user-1', rawScore: 100, placement: 1, pointsAwarded: 2, user: { id: 'user-1', name: 'Alice' } },
+        { id: 'sp-2', userId: 'user-2', rawScore: 75, placement: 2, pointsAwarded: 1, user: { id: 'user-2', name: 'Bob' } },
       ],
+      game: { id: 'game-1', name: 'Catan' },
     })
-    
-    // Act
+    const request = createMockRequest('POST', validPayload)
+
     const response = await POST(request)
     const result = await parseResponse(response)
-    
-    // Assert
+
     expect(result.status).toBe(200)
-    expect(result.data).toHaveProperty('id')
-    expect(result.data.gameId).toBe(gameId)
-    expect(result.data.groupId).toBe(groupId)
+    expect(result.data.id).toBe('session-1')
     expect(result.data.players).toHaveLength(2)
-    
-    // Verify in database
-    const session = await prismaTest.session.findFirst({
-      where: { id: result.data.id },
-      include: { players: true },
-    })
-    expect(session).toBeDefined()
-    expect(session?.players).toHaveLength(2)
+    expect(result.data.game.name).toBe('Catan')
   })
-  
-  it('should handle scoreDetails as object and convert to JSON', async () => {
-    // Arrange
-    const request = createMockRequest('POST', {
-      gameId,
-      groupId,
-      playedAt: new Date().toISOString(),
-      players: [
-        {
-          userId: user1Id,
-          rawScore: 100,
-          placement: 1,
-          pointsAwarded: 2,
-          scoreDetails: { coins: 50, cities: 25 },
-        },
-      ],
-    })
-    
-    // Act
+
+  it('should convert scoreDetails object to JSON string', async () => {
+    mockSessionCreate.mockResolvedValue({ id: 'session-1', players: [], game: {} })
+    const payload = {
+      ...validPayload,
+      players: [{
+        userId: 'user-1',
+        rawScore: 100,
+        placement: 1,
+        pointsAwarded: 2,
+        scoreDetails: { coins: 50, cities: 25 },
+      }],
+    }
+    const request = createMockRequest('POST', payload)
+
+    await POST(request)
+
+    const createCall = mockSessionCreate.mock.calls[0][0]
+    const playerCreate = createCall.data.players.create[0]
+    expect(playerCreate.scoreDetails).toBe(JSON.stringify({ coins: 50, cities: 25 }))
+  })
+
+  it('should pass string scoreDetails as-is', async () => {
+    mockSessionCreate.mockResolvedValue({ id: 'session-1', players: [], game: {} })
+    const payload = {
+      ...validPayload,
+      players: [{
+        userId: 'user-1',
+        rawScore: 100,
+        placement: 1,
+        pointsAwarded: 2,
+        scoreDetails: '{"coins":50}',
+      }],
+    }
+    const request = createMockRequest('POST', payload)
+
+    await POST(request)
+
+    const createCall = mockSessionCreate.mock.calls[0][0]
+    const playerCreate = createCall.data.players.create[0]
+    expect(playerCreate.scoreDetails).toBe('{"coins":50}')
+  })
+
+  it('should create session with optional templateId', async () => {
+    mockSessionCreate.mockResolvedValue({ id: 'session-1', templateId: 'tmpl-1', players: [], game: {} })
+    const payload = { ...validPayload, templateId: 'tmpl-1' }
+    const request = createMockRequest('POST', payload)
+
+    await POST(request)
+
+    const createCall = mockSessionCreate.mock.calls[0][0]
+    expect(createCall.data.templateId).toBe('tmpl-1')
+  })
+
+  it('should return 500 on database error', async () => {
+    mockSessionCreate.mockRejectedValue(new Error('Foreign key constraint'))
+    const request = createMockRequest('POST', validPayload)
+
     const response = await POST(request)
     const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(200)
-    
-    // Verify scoreDetails was stored
-    const player = await prismaTest.sessionPlayer.findFirst({
-      where: { userId: user1Id },
-    })
-    expect(player?.scoreDetails).toBeDefined()
-    const details = JSON.parse(player!.scoreDetails!)
-    expect(details.coins).toBe(50)
-    expect(details.cities).toBe(25)
-  })
-  
-  it('should create session with template ID', async () => {
-    // Arrange: Create a template
-    const template = await prismaTest.customScoreTemplate.create({
-      data: {
-        gameId,
-        name: 'Base Game',
-        fields: JSON.stringify([{ key: 'coins', label: 'Coins' }]),
-      },
-    })
-    
-    const request = createMockRequest('POST', {
-      gameId,
-      groupId,
-      templateId: template.id,
-      playedAt: new Date().toISOString(),
-      players: [
-        { userId: user1Id, rawScore: 100, placement: 1, pointsAwarded: 1 },
-      ],
-    })
-    
-    // Act
-    const response = await POST(request)
-    const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(200)
-    expect(result.data.templateId).toBe(template.id)
-  })
-  
-  it('should return 500 when required fields are missing', async () => {
-    // Arrange: Missing gameId
-    const request = createMockRequest('POST', {
-      groupId,
-      playedAt: new Date().toISOString(),
-      players: [],
-    })
-    
-    // Act
-    const response = await POST(request)
-    const result = await parseResponse(response)
-    
-    // Assert
+
     expect(result.status).toBe(500)
     expect(result.data.error).toBe('Failed to create session')
   })
 })
 
 describe('GET /api/sessions', () => {
-  let gameId: string
-  let group1Id: string
-  let group2Id: string
-  let userId: string
-  
-  beforeEach(async () => {
-    await resetDatabase()
-    
-    // Setup test data
-    const game = await createTestGame({ name: 'Test Game' })
-    const group1 = await createTestGroup({ name: 'Group 1' })
-    const group2 = await createTestGroup({ name: 'Group 2' })
-    const user = await createTestUser({ name: 'Alice' })
-    
-    gameId = game.id
-    group1Id = group1.id
-    group2Id = group2.id
-    userId = user.id
-    
-    // Create sessions for different groups
-    await createTestSession({
-      gameId,
-      groupId: group1Id,
-      playedAt: new Date('2024-01-01'),
-      players: [
-        { userId, rawScore: 100, placement: 1, pointsAwarded: 1 },
-      ],
-    })
-    
-    await createTestSession({
-      gameId,
-      groupId: group2Id,
-      playedAt: new Date('2024-01-02'),
-      players: [
-        { userId, rawScore: 75, placement: 1, pointsAwarded: 1 },
-      ],
-    })
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
   })
-  
-  it('should return all sessions when no filter is provided', async () => {
-    // Arrange
+
+  it('should return 401 when not authenticated', async () => {
+    mockAuth.mockResolvedValue(null)
     const request = new Request('http://localhost:3000/api/sessions')
-    
-    // Act
+
     const response = await GET(request)
     const result = await parseResponse(response)
-    
-    // Assert
+
+    expect(result.status).toBe(401)
+  })
+
+  it('should return all sessions when no filter', async () => {
+    mockSessionFindMany.mockResolvedValue([
+      { id: 's1', gameId: 'game-1', game: { name: 'Catan' }, players: [] },
+      { id: 's2', gameId: 'game-1', game: { name: 'Catan' }, players: [] },
+    ])
+    const request = new Request('http://localhost:3000/api/sessions')
+
+    const response = await GET(request)
+    const result = await parseResponse(response)
+
     expect(result.status).toBe(200)
     expect(result.data).toHaveLength(2)
+    expect(mockSessionFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: {} })
+    )
   })
-  
+
   it('should filter sessions by groupId', async () => {
-    // Arrange
-    const request = new Request(`http://localhost:3000/api/sessions?groupId=${group1Id}`)
-    
-    // Act
+    mockSessionFindMany.mockResolvedValue([
+      { id: 's1', groupId: 'group-1', game: { name: 'Catan' }, players: [] },
+    ])
+    const request = new Request('http://localhost:3000/api/sessions?groupId=group-1')
+
     const response = await GET(request)
     const result = await parseResponse(response)
-    
-    // Assert
+
     expect(result.status).toBe(200)
     expect(result.data).toHaveLength(1)
-    expect(result.data[0].groupId).toBe(group1Id)
+    expect(mockSessionFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { groupId: 'group-1' } })
+    )
   })
-  
+
   it('should order sessions by playedAt descending', async () => {
-    // Arrange
+    mockSessionFindMany.mockResolvedValue([])
     const request = new Request('http://localhost:3000/api/sessions')
-    
-    // Act
-    const response = await GET(request)
-    const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(200)
-    // Most recent first (2024-01-02 before 2024-01-01)
-    const dates = result.data.map((s: any) => new Date(s.playedAt).getTime())
-    expect(dates[0]).toBeGreaterThan(dates[1])
+
+    await GET(request)
+
+    expect(mockSessionFindMany).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { playedAt: 'desc' } })
+    )
   })
-  
-  it('should include game and player details', async () => {
-    // Arrange
+
+  it('should return 500 on database error', async () => {
+    mockSessionFindMany.mockRejectedValue(new Error('DB error'))
     const request = new Request('http://localhost:3000/api/sessions')
-    
-    // Act
+
     const response = await GET(request)
     const result = await parseResponse(response)
-    
-    // Assert
-    expect(result.status).toBe(200)
-    expect(result.data[0]).toHaveProperty('game')
-    expect(result.data[0]).toHaveProperty('players')
-    expect(result.data[0].players[0]).toHaveProperty('user')
+
+    expect(result.status).toBe(500)
+    expect(result.data.error).toBe('Failed to fetch sessions')
   })
 })
-

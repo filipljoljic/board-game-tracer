@@ -3,12 +3,28 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CreateGroupDialog } from "./create-group-dialog";
 
-// Mock fetch globally
-global.fetch = vi.fn();
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
+
+function mockFetchResponses(responses: Record<string, unknown>) {
+  mockFetch.mockImplementation((url: string) => {
+    const data = responses[url] ?? [];
+    return Promise.resolve({
+      ok: true,
+      json: async () => data,
+    } as Response);
+  });
+}
 
 describe("CreateGroupDialog", () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
+    mockFetchResponses({
+      "/api/users": [
+        { id: "1", name: "Alice", email: "alice@test.com" },
+        { id: "2", name: "Bob", email: "bob@test.com" },
+      ],
+    });
   });
 
   it("should render the trigger button", () => {
@@ -43,12 +59,22 @@ describe("CreateGroupDialog", () => {
 
   it("should submit form and create group", async () => {
     const user = userEvent.setup();
-    const mockFetch = vi.mocked(fetch);
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ id: "1", name: "Test Group" }),
-    } as Response);
+    mockFetch.mockImplementation((url: string, options?: RequestInit) => {
+      if (url === "/api/users") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
+      if (url === "/api/groups" && options?.method === "POST") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ id: "1", name: "Test Group" }),
+        } as Response);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
+    });
 
     render(<CreateGroupDialog />);
 
@@ -67,20 +93,36 @@ describe("CreateGroupDialog", () => {
         "/api/groups",
         expect.objectContaining({
           method: "POST",
-          body: JSON.stringify({ name: "Test Group" }),
         })
       );
     });
+
+    const groupsCall = mockFetch.mock.calls.find(
+      (call: unknown[]) => call[0] === "/api/groups"
+    );
+    expect(groupsCall).toBeDefined();
+    const body = JSON.parse(groupsCall![1].body);
+    expect(body.name).toBe("Test Group");
   });
 
   it("should close dialog after successful submission", async () => {
     const user = userEvent.setup();
-    const mockFetch = vi.mocked(fetch);
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ id: "1", name: "Test Group" }),
-    } as Response);
+    mockFetch.mockImplementation((url: string, options?: RequestInit) => {
+      if (url === "/api/users") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => [],
+        } as Response);
+      }
+      if (url === "/api/groups" && options?.method === "POST") {
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({ id: "1", name: "Test Group" }),
+        } as Response);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) } as Response);
+    });
 
     render(<CreateGroupDialog />);
 
@@ -94,7 +136,6 @@ describe("CreateGroupDialog", () => {
     const submitButton = screen.getByRole("button", { name: /create/i });
     await user.click(submitButton);
 
-    // Dialog should close
     await waitFor(() => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     });
