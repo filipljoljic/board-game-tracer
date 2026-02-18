@@ -1,8 +1,0 @@
-{
-  "enableAllProjectMcpServers": false,
-  "enabledMcpjsonServers": [
-    "smithery-dev-filip",
-    "sequential-thinking",
-    "context7-mcp"
-  ]
-}
