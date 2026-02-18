@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -29,6 +33,7 @@ jobs:
         continue-on-error: true
 
       - name: Run unit tests
+        id: unit-tests
         run: npm run test:unit
 
       - name: Upload test results
@@ -53,24 +58,16 @@ jobs:
         with:
           script: |
             const fs = require('fs');
+            const unitStatus = '${{ steps.unit-tests.outcome }}';
 
             let comment = '## Test Results\n\n';
+            comment += '| Type | Status |\n';
+            comment += '|------|--------|\n';
+            comment += `| Unit Tests | ${unitStatus === 'success' ? '✅ Passed' : '❌ Failed'} |\n`;
 
-            // Check if JUnit results exist
-            const junitPath = 'test-results/vitest-results.xml';
-            if (fs.existsSync(junitPath)) {
-              comment += '| Type | Status |\n';
-              comment += '|------|--------|\n';
-              comment += `| Unit Tests | ${ process.env.UNIT_TEST_STATUS === 'success' ? '✅ Passed' : '❌ Failed' } |\n`;
-            } else {
-              comment += 'No test results found.\n';
-            }
-
-            github.rest.issues.createComment({
+            await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
             });
-        env:
-          UNIT_TEST_STATUS: ${{ steps.test.outcome }}
