@@ -58,3 +58,6 @@ cursor/
 .agents/
 .github/*
 !.github/workflows/
+
+# MCP config (local dev only, contains API keys)
+.mcp.json
