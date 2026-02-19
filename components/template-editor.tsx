@@ -156,7 +156,7 @@ export default function TemplateEditor({ gameId, initialData }: TemplateFormProp
 
             {fields.length === 0 && (
               <p className="text-muted-foreground text-sm text-center py-4 border border-dashed rounded">
-                No fields added. Click "Add Field" to start.
+                No fields added. Click &quot;Add Field&quot; to start.
               </p>
             )}
 

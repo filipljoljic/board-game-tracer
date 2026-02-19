@@ -82,7 +82,12 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
 
   if (!session) notFound()
 
-  const templateFields = session.template ? JSON.parse(session.template.fields) : []
+  type TemplateField = {
+    key: string;
+    label: string;
+  }
+
+  const templateFields: TemplateField[] = session.template ? JSON.parse(session.template.fields) : []
 
   return (
     <div className="container mx-auto px-4 md:px-6 py-6 md:py-10">
@@ -134,7 +139,7 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Player</TableHead>
-                                    {templateFields.map((f: any) => (
+                                    {templateFields.map((f) => (
                                         <TableHead key={f.key} className="text-right">{f.label}</TableHead>
                                     ))}
                                     <TableHead className="text-right">Total</TableHead>
@@ -142,11 +147,11 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
                             </TableHeader>
                             <TableBody>
                                 {session.players.map(player => {
-                                    const details = player.scoreDetails ? JSON.parse(player.scoreDetails) : {}
+                                    const details: Record<string, number> = player.scoreDetails ? JSON.parse(player.scoreDetails) : {}
                                     return (
                                         <TableRow key={player.id}>
                                             <TableCell className="font-medium">{player.user.name}</TableCell>
-                                            {templateFields.map((f: any) => (
+                                            {templateFields.map((f) => (
                                                 <TableCell key={f.key} className="text-right">
                                                     {details[f.key] || 0}
                                                 </TableCell>

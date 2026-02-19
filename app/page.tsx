@@ -43,7 +43,7 @@ export default async function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Organize your game nights with friends and track everyone's progress together
+                  Organize your game nights with friends and track everyone&apos;s progress together
                 </p>
               </CardContent>
             </Card>
@@ -57,7 +57,7 @@ export default async function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Record every session and see who's winning with detailed leaderboards
+                  Record every session and see who&apos;s winning with detailed leaderboards
                 </p>
               </CardContent>
             </Card>
@@ -85,7 +85,7 @@ export default async function Home() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Can't decide what to play? Let us pick the perfect game for your group
+                  Can&apos;t decide what to play? Let us pick the perfect game for your group
                 </p>
               </CardContent>
             </Card>

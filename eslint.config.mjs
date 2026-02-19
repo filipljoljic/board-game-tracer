@@ -13,6 +13,14 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Disable react-hooks rules for e2e test files
+  // Playwright fixtures use a `use()` function that triggers false positives
+  {
+    files: ["e2e/**/*.ts", "e2e/**/*.tsx"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;
