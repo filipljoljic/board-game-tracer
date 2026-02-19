@@ -16,6 +16,20 @@ interface ContinueSessionProps {
   userId: string
 }
 
+export function getPlacementSuffix(placement: number): string {
+  if (placement === 1) return 'st'
+  if (placement === 2) return 'nd'
+  if (placement === 3) return 'rd'
+  return 'th'
+}
+
+export function getPlacementLabel(placement: number, totalPlayers: number): string {
+  if (totalPlayers <= 0) return ''
+  if (placement === 1) return 'Winner!'
+  if (placement === totalPlayers) return 'Last place'
+  return `${placement}${getPlacementSuffix(placement)} of ${totalPlayers}`
+}
+
 export function ContinueSession({ session, userId }: ContinueSessionProps) {
   const userPlayer = session.players.find(p => p.userId === userId)
   
@@ -26,13 +40,6 @@ export function ContinueSession({ session, userId }: ContinueSessionProps) {
     if (placement === 2) return <Medal className="h-5 w-5 text-gray-400" />
     if (placement === 3) return <Award className="h-5 w-5 text-amber-700" />
     return null
-  }
-
-  const getPlacementSuffix = (placement: number) => {
-    if (placement === 1) return 'st'
-    if (placement === 2) return 'nd'
-    if (placement === 3) return 'rd'
-    return 'th'
   }
 
   return (
@@ -52,8 +59,13 @@ export function ContinueSession({ session, userId }: ContinueSessionProps) {
             <div className="flex items-center gap-2">
               {getPlacementIcon(userPlayer.placement)}
               <span className="text-sm font-medium">
-                You placed {userPlayer.placement}{getPlacementSuffix(userPlayer.placement)}!
+                {getPlacementLabel(userPlayer.placement, session.players.length)}
               </span>
+              {userPlayer.rawScore != null && (
+                <span className="text-xs text-muted-foreground ml-1">
+                  ({userPlayer.rawScore} pts)
+                </span>
+              )}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
