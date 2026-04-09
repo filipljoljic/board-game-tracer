@@ -60,8 +60,8 @@ export async function POST(request: Request) {
         }
       }
     })
-    revalidateTag('groups')
-    revalidateTag(`user-${session.user.id}-groups`)
+    revalidateTag('groups', 'max')
+    revalidateTag(`user-${session.user.id}-groups`, 'max')
 
     return NextResponse.json(group)
   } catch {
