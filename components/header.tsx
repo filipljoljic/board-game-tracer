@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,11 @@ export default function Header() {
   const { data: session, status } = useSession()
   const isLoading = status === 'loading'
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
     <header className="border-b">
@@ -37,7 +42,7 @@ export default function Header() {
                 <BarChart3 className="h-4 w-4" />
                 Statistics
               </Link>
-              <RandomizerDialog />
+              {mounted && <RandomizerDialog />}
             </nav>
           </div>
           <div className="flex items-center gap-2 md:gap-4">
@@ -105,7 +110,7 @@ export default function Header() {
                 Statistics
               </Link>
               <div className="py-2">
-                <RandomizerDialog />
+                {mounted && <RandomizerDialog />}
               </div>
             </nav>
             {session?.user && (
