@@ -18,6 +18,10 @@ vi.mock('@/auth', () => ({
   auth: () => mockAuth(),
 }))
 
+vi.mock('next/cache', () => ({
+  revalidateTag: vi.fn(),
+}))
+
 import { GET, POST } from './route'
 
 describe('GET /api/groups', () => {

@@ -85,7 +85,7 @@ describe("CreateGroupDialog", () => {
       await user.type(input, "Test Group");
     });
 
-    const submitButton = screen.getByRole("button", { name: /create/i });
+    const submitButton = screen.getByTestId("submit-group-button");
     await user.click(submitButton);
 
     await waitFor(() => {
@@ -133,7 +133,7 @@ describe("CreateGroupDialog", () => {
       await user.type(input, "Test Group");
     });
 
-    const submitButton = screen.getByRole("button", { name: /create/i });
+    const submitButton = screen.getByTestId("submit-group-button");
     await user.click(submitButton);
 
     await waitFor(() => {
