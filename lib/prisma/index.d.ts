@@ -6348,8 +6348,18 @@ export namespace Prisma {
 
   export type AggregateSession = {
     _count: SessionCountAggregateOutputType | null
+    _avg: SessionAvgAggregateOutputType | null
+    _sum: SessionSumAggregateOutputType | null
     _min: SessionMinAggregateOutputType | null
     _max: SessionMaxAggregateOutputType | null
+  }
+
+  export type SessionAvgAggregateOutputType = {
+    durationMinutes: number | null
+  }
+
+  export type SessionSumAggregateOutputType = {
+    durationMinutes: number | null
   }
 
   export type SessionMinAggregateOutputType = {
@@ -6358,6 +6368,9 @@ export namespace Prisma {
     templateId: string | null
     groupId: string | null
     playedAt: Date | null
+    durationMinutes: number | null
+    startedAt: Date | null
+    endedAt: Date | null
   }
 
   export type SessionMaxAggregateOutputType = {
@@ -6366,6 +6379,9 @@ export namespace Prisma {
     templateId: string | null
     groupId: string | null
     playedAt: Date | null
+    durationMinutes: number | null
+    startedAt: Date | null
+    endedAt: Date | null
   }
 
   export type SessionCountAggregateOutputType = {
@@ -6374,9 +6390,20 @@ export namespace Prisma {
     templateId: number
     groupId: number
     playedAt: number
+    durationMinutes: number
+    startedAt: number
+    endedAt: number
     _all: number
   }
 
+
+  export type SessionAvgAggregateInputType = {
+    durationMinutes?: true
+  }
+
+  export type SessionSumAggregateInputType = {
+    durationMinutes?: true
+  }
 
   export type SessionMinAggregateInputType = {
     id?: true
@@ -6384,6 +6411,9 @@ export namespace Prisma {
     templateId?: true
     groupId?: true
     playedAt?: true
+    durationMinutes?: true
+    startedAt?: true
+    endedAt?: true
   }
 
   export type SessionMaxAggregateInputType = {
@@ -6392,6 +6422,9 @@ export namespace Prisma {
     templateId?: true
     groupId?: true
     playedAt?: true
+    durationMinutes?: true
+    startedAt?: true
+    endedAt?: true
   }
 
   export type SessionCountAggregateInputType = {
@@ -6400,6 +6433,9 @@ export namespace Prisma {
     templateId?: true
     groupId?: true
     playedAt?: true
+    durationMinutes?: true
+    startedAt?: true
+    endedAt?: true
     _all?: true
   }
 
@@ -6441,6 +6477,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: SessionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SessionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: SessionMinAggregateInputType
@@ -6471,6 +6519,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: SessionCountAggregateInputType | true
+    _avg?: SessionAvgAggregateInputType
+    _sum?: SessionSumAggregateInputType
     _min?: SessionMinAggregateInputType
     _max?: SessionMaxAggregateInputType
   }
@@ -6481,7 +6531,12 @@ export namespace Prisma {
     templateId: string | null
     groupId: string
     playedAt: Date
+    durationMinutes: number | null
+    startedAt: Date | null
+    endedAt: Date | null
     _count: SessionCountAggregateOutputType | null
+    _avg: SessionAvgAggregateOutputType | null
+    _sum: SessionSumAggregateOutputType | null
     _min: SessionMinAggregateOutputType | null
     _max: SessionMaxAggregateOutputType | null
   }
@@ -6506,6 +6561,9 @@ export namespace Prisma {
     templateId?: boolean
     groupId?: boolean
     playedAt?: boolean
+    durationMinutes?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
     players?: boolean | Session$playersArgs<ExtArgs>
     game?: boolean | GameDefaultArgs<ExtArgs>
     template?: boolean | Session$templateArgs<ExtArgs>
@@ -6519,6 +6577,9 @@ export namespace Prisma {
     templateId?: boolean
     groupId?: boolean
     playedAt?: boolean
+    durationMinutes?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
     game?: boolean | GameDefaultArgs<ExtArgs>
     template?: boolean | Session$templateArgs<ExtArgs>
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -6530,6 +6591,9 @@ export namespace Prisma {
     templateId?: boolean
     groupId?: boolean
     playedAt?: boolean
+    durationMinutes?: boolean
+    startedAt?: boolean
+    endedAt?: boolean
   }
 
   export type SessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -6559,6 +6623,9 @@ export namespace Prisma {
       templateId: string | null
       groupId: string
       playedAt: Date
+      durationMinutes: number | null
+      startedAt: Date | null
+      endedAt: Date | null
     }, ExtArgs["result"]["session"]>
     composites: {}
   }
@@ -6961,6 +7028,9 @@ export namespace Prisma {
     readonly templateId: FieldRef<"Session", 'String'>
     readonly groupId: FieldRef<"Session", 'String'>
     readonly playedAt: FieldRef<"Session", 'DateTime'>
+    readonly durationMinutes: FieldRef<"Session", 'Int'>
+    readonly startedAt: FieldRef<"Session", 'DateTime'>
+    readonly endedAt: FieldRef<"Session", 'DateTime'>
   }
     
 
@@ -8406,7 +8476,10 @@ export namespace Prisma {
     gameId: 'gameId',
     templateId: 'templateId',
     groupId: 'groupId',
-    playedAt: 'playedAt'
+    playedAt: 'playedAt',
+    durationMinutes: 'durationMinutes',
+    startedAt: 'startedAt',
+    endedAt: 'endedAt'
   };
 
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -8490,20 +8563,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -8514,6 +8573,20 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -8814,6 +8887,9 @@ export namespace Prisma {
     templateId?: StringNullableFilter<"Session"> | string | null
     groupId?: StringFilter<"Session"> | string
     playedAt?: DateTimeFilter<"Session"> | Date | string
+    durationMinutes?: IntNullableFilter<"Session"> | number | null
+    startedAt?: DateTimeNullableFilter<"Session"> | Date | string | null
+    endedAt?: DateTimeNullableFilter<"Session"> | Date | string | null
     players?: SessionPlayerListRelationFilter
     game?: XOR<GameRelationFilter, GameWhereInput>
     template?: XOR<CustomScoreTemplateNullableRelationFilter, CustomScoreTemplateWhereInput> | null
@@ -8826,6 +8902,9 @@ export namespace Prisma {
     templateId?: SortOrderInput | SortOrder
     groupId?: SortOrder
     playedAt?: SortOrder
+    durationMinutes?: SortOrderInput | SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    endedAt?: SortOrderInput | SortOrder
     players?: SessionPlayerOrderByRelationAggregateInput
     game?: GameOrderByWithRelationInput
     template?: CustomScoreTemplateOrderByWithRelationInput
@@ -8841,6 +8920,9 @@ export namespace Prisma {
     templateId?: StringNullableFilter<"Session"> | string | null
     groupId?: StringFilter<"Session"> | string
     playedAt?: DateTimeFilter<"Session"> | Date | string
+    durationMinutes?: IntNullableFilter<"Session"> | number | null
+    startedAt?: DateTimeNullableFilter<"Session"> | Date | string | null
+    endedAt?: DateTimeNullableFilter<"Session"> | Date | string | null
     players?: SessionPlayerListRelationFilter
     game?: XOR<GameRelationFilter, GameWhereInput>
     template?: XOR<CustomScoreTemplateNullableRelationFilter, CustomScoreTemplateWhereInput> | null
@@ -8853,9 +8935,14 @@ export namespace Prisma {
     templateId?: SortOrderInput | SortOrder
     groupId?: SortOrder
     playedAt?: SortOrder
+    durationMinutes?: SortOrderInput | SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    endedAt?: SortOrderInput | SortOrder
     _count?: SessionCountOrderByAggregateInput
+    _avg?: SessionAvgOrderByAggregateInput
     _max?: SessionMaxOrderByAggregateInput
     _min?: SessionMinOrderByAggregateInput
+    _sum?: SessionSumOrderByAggregateInput
   }
 
   export type SessionScalarWhereWithAggregatesInput = {
@@ -8867,6 +8954,9 @@ export namespace Prisma {
     templateId?: StringNullableWithAggregatesFilter<"Session"> | string | null
     groupId?: StringWithAggregatesFilter<"Session"> | string
     playedAt?: DateTimeWithAggregatesFilter<"Session"> | Date | string
+    durationMinutes?: IntNullableWithAggregatesFilter<"Session"> | number | null
+    startedAt?: DateTimeNullableWithAggregatesFilter<"Session"> | Date | string | null
+    endedAt?: DateTimeNullableWithAggregatesFilter<"Session"> | Date | string | null
   }
 
   export type SessionPlayerWhereInput = {
@@ -9240,6 +9330,9 @@ export namespace Prisma {
   export type SessionCreateInput = {
     id?: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerCreateNestedManyWithoutSessionInput
     game: GameCreateNestedOneWithoutSessionsInput
     template?: CustomScoreTemplateCreateNestedOneWithoutSessionsInput
@@ -9252,12 +9345,18 @@ export namespace Prisma {
     templateId?: string | null
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerUncheckedCreateNestedManyWithoutSessionInput
   }
 
   export type SessionUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUpdateManyWithoutSessionNestedInput
     game?: GameUpdateOneRequiredWithoutSessionsNestedInput
     template?: CustomScoreTemplateUpdateOneWithoutSessionsNestedInput
@@ -9270,6 +9369,9 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUncheckedUpdateManyWithoutSessionNestedInput
   }
 
@@ -9279,11 +9381,17 @@ export namespace Prisma {
     templateId?: string | null
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
   }
 
   export type SessionUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionUncheckedUpdateManyInput = {
@@ -9292,6 +9400,9 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionPlayerCreateInput = {
@@ -9668,6 +9779,17 @@ export namespace Prisma {
     fields?: SortOrder
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type CustomScoreTemplateNullableRelationFilter = {
     is?: CustomScoreTemplateWhereInput | null
     isNot?: CustomScoreTemplateWhereInput | null
@@ -9679,6 +9801,13 @@ export namespace Prisma {
     templateId?: SortOrder
     groupId?: SortOrder
     playedAt?: SortOrder
+    durationMinutes?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+  }
+
+  export type SessionAvgOrderByAggregateInput = {
+    durationMinutes?: SortOrder
   }
 
   export type SessionMaxOrderByAggregateInput = {
@@ -9687,6 +9816,9 @@ export namespace Prisma {
     templateId?: SortOrder
     groupId?: SortOrder
     playedAt?: SortOrder
+    durationMinutes?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
   }
 
   export type SessionMinOrderByAggregateInput = {
@@ -9695,6 +9827,29 @@ export namespace Prisma {
     templateId?: SortOrder
     groupId?: SortOrder
     playedAt?: SortOrder
+    durationMinutes?: SortOrder
+    startedAt?: SortOrder
+    endedAt?: SortOrder
+  }
+
+  export type SessionSumOrderByAggregateInput = {
+    durationMinutes?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -10186,6 +10341,14 @@ export namespace Prisma {
     connect?: SessionPlayerWhereUniqueInput | SessionPlayerWhereUniqueInput[]
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type SessionPlayerUpdateManyWithoutSessionNestedInput = {
     create?: XOR<SessionPlayerCreateWithoutSessionInput, SessionPlayerUncheckedCreateWithoutSessionInput> | SessionPlayerCreateWithoutSessionInput[] | SessionPlayerUncheckedCreateWithoutSessionInput[]
     connectOrCreate?: SessionPlayerCreateOrConnectWithoutSessionInput | SessionPlayerCreateOrConnectWithoutSessionInput[]
@@ -10431,6 +10594,33 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedFloatFilter<$PrismaModel = never> = {
     equals?: number | FloatFieldRefInput<$PrismaModel>
     in?: number[] | ListFloatFieldRefInput<$PrismaModel>
@@ -10604,6 +10794,9 @@ export namespace Prisma {
   export type SessionCreateWithoutGroupInput = {
     id?: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerCreateNestedManyWithoutSessionInput
     game: GameCreateNestedOneWithoutSessionsInput
     template?: CustomScoreTemplateCreateNestedOneWithoutSessionsInput
@@ -10614,6 +10807,9 @@ export namespace Prisma {
     gameId: string
     templateId?: string | null
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerUncheckedCreateNestedManyWithoutSessionInput
   }
 
@@ -10668,6 +10864,9 @@ export namespace Prisma {
     templateId?: StringNullableFilter<"Session"> | string | null
     groupId?: StringFilter<"Session"> | string
     playedAt?: DateTimeFilter<"Session"> | Date | string
+    durationMinutes?: IntNullableFilter<"Session"> | number | null
+    startedAt?: DateTimeNullableFilter<"Session"> | Date | string | null
+    endedAt?: DateTimeNullableFilter<"Session"> | Date | string | null
   }
 
   export type GroupCreateWithoutMembersInput = {
@@ -10817,6 +11016,9 @@ export namespace Prisma {
   export type SessionCreateWithoutGameInput = {
     id?: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerCreateNestedManyWithoutSessionInput
     template?: CustomScoreTemplateCreateNestedOneWithoutSessionsInput
     group: GroupCreateNestedOneWithoutSessionsInput
@@ -10827,6 +11029,9 @@ export namespace Prisma {
     templateId?: string | null
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerUncheckedCreateNestedManyWithoutSessionInput
   }
 
@@ -10902,6 +11107,9 @@ export namespace Prisma {
   export type SessionCreateWithoutTemplateInput = {
     id?: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerCreateNestedManyWithoutSessionInput
     game: GameCreateNestedOneWithoutSessionsInput
     group: GroupCreateNestedOneWithoutSessionsInput
@@ -10912,6 +11120,9 @@ export namespace Prisma {
     gameId: string
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     players?: SessionPlayerUncheckedCreateNestedManyWithoutSessionInput
   }
 
@@ -11135,6 +11346,9 @@ export namespace Prisma {
   export type SessionCreateWithoutPlayersInput = {
     id?: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
     game: GameCreateNestedOneWithoutSessionsInput
     template?: CustomScoreTemplateCreateNestedOneWithoutSessionsInput
     group: GroupCreateNestedOneWithoutSessionsInput
@@ -11146,6 +11360,9 @@ export namespace Prisma {
     templateId?: string | null
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
   }
 
   export type SessionCreateOrConnectWithoutPlayersInput = {
@@ -11204,6 +11421,9 @@ export namespace Prisma {
   export type SessionUpdateWithoutPlayersInput = {
     id?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     game?: GameUpdateOneRequiredWithoutSessionsNestedInput
     template?: CustomScoreTemplateUpdateOneWithoutSessionsNestedInput
     group?: GroupUpdateOneRequiredWithoutSessionsNestedInput
@@ -11215,6 +11435,9 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUpsertWithoutSessionsInput = {
@@ -11331,6 +11554,9 @@ export namespace Prisma {
     gameId: string
     templateId?: string | null
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
   }
 
   export type GroupMemberUpdateWithoutGroupInput = {
@@ -11354,6 +11580,9 @@ export namespace Prisma {
   export type SessionUpdateWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUpdateManyWithoutSessionNestedInput
     game?: GameUpdateOneRequiredWithoutSessionsNestedInput
     template?: CustomScoreTemplateUpdateOneWithoutSessionsNestedInput
@@ -11364,6 +11593,9 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUncheckedUpdateManyWithoutSessionNestedInput
   }
 
@@ -11372,6 +11604,9 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type CustomScoreTemplateCreateManyGameInput = {
@@ -11385,6 +11620,9 @@ export namespace Prisma {
     templateId?: string | null
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
   }
 
   export type CustomScoreTemplateUpdateWithoutGameInput = {
@@ -11410,6 +11648,9 @@ export namespace Prisma {
   export type SessionUpdateWithoutGameInput = {
     id?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUpdateManyWithoutSessionNestedInput
     template?: CustomScoreTemplateUpdateOneWithoutSessionsNestedInput
     group?: GroupUpdateOneRequiredWithoutSessionsNestedInput
@@ -11420,6 +11661,9 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUncheckedUpdateManyWithoutSessionNestedInput
   }
 
@@ -11428,6 +11672,9 @@ export namespace Prisma {
     templateId?: NullableStringFieldUpdateOperationsInput | string | null
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionCreateManyTemplateInput = {
@@ -11435,11 +11682,17 @@ export namespace Prisma {
     gameId: string
     groupId: string
     playedAt?: Date | string
+    durationMinutes?: number | null
+    startedAt?: Date | string | null
+    endedAt?: Date | string | null
   }
 
   export type SessionUpdateWithoutTemplateInput = {
     id?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUpdateManyWithoutSessionNestedInput
     game?: GameUpdateOneRequiredWithoutSessionsNestedInput
     group?: GroupUpdateOneRequiredWithoutSessionsNestedInput
@@ -11450,6 +11703,9 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     players?: SessionPlayerUncheckedUpdateManyWithoutSessionNestedInput
   }
 
@@ -11458,6 +11714,9 @@ export namespace Prisma {
     gameId?: StringFieldUpdateOperationsInput | string
     groupId?: StringFieldUpdateOperationsInput | string
     playedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    durationMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionPlayerCreateManySessionInput = {

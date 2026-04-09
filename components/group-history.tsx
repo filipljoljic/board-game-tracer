@@ -2,12 +2,14 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Calendar } from 'lucide-react'
+import { formatDurationMinutes } from '@/lib/duration'
 
 interface SessionHistory {
     id: string
     gameName: string
-    playedAt: Date | string  // Can be string when coming from cache
+    playedAt: Date | string
     winnerNames: string[]
+    durationMinutes?: number | null
 }
 
 export function GroupHistory({ sessions }: { sessions: SessionHistory[] }) {
@@ -25,6 +27,7 @@ export function GroupHistory({ sessions }: { sessions: SessionHistory[] }) {
                   <p className="font-medium truncate">{session.gameName}</p>
                   <p className="text-sm text-muted-foreground">
                     {new Date(session.playedAt).toLocaleDateString()}
+                    {session.durationMinutes != null && ` · ${formatDurationMinutes(session.durationMinutes)}`}
                   </p>
                 </div>
                 <div className="md:text-right flex-shrink-0">

@@ -29,7 +29,8 @@ interface StatsData {
     last: number
   }
   pieData: { name: string; value: number; fill: string }[]
-  gamesData: { name: string; played: number; wins: number; winRate: number }[]
+  gamesData: { name: string; played: number; wins: number; winRate: number; avgDuration?: number | null }[]
+  averageDuration?: number | null
   groups?: Group[]
 }
 
@@ -156,6 +157,7 @@ export default function StatisticsPage() {
             totalGames={displayStats.totalGames}
             wins={displayStats.summary.wins}
             last={displayStats.summary.last}
+            averageDuration={displayStats.averageDuration}
           />
 
           {/* Charts */}

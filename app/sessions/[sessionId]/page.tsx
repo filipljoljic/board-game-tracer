@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db'
 import { notFound } from 'next/navigation'
+import { formatDurationMinutes } from '@/lib/duration'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Table,
@@ -91,6 +92,7 @@ export default async function SessionPage({ params }: { params: Promise<{ sessio
         <div className="text-muted-foreground">
             <p>Group: {session.group.name}</p>
             <p>Date: {session.playedAt.toLocaleDateString()} {session.playedAt.toLocaleTimeString()}</p>
+            {session.durationMinutes != null && <p>Duration: {formatDurationMinutes(session.durationMinutes)}</p>}
             {session.template && <p>Template: {session.template.name}</p>}
         </div>
       </div>
