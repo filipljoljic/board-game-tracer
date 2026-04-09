@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import useSWR from 'swr'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,9 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from 'sonner'
 import { useImmutableSWR } from '@/lib/swr'
+import { useSessionTimer, formatDuration, formatDurationMinutes } from '@/lib/use-session-timer'
+import { SessionTimerBar } from '@/components/session-timer-bar'
+import { Timer, Clock } from 'lucide-react'
 
 type Game = { id: string; name: string }
 type Group = { id: string; name: string }
@@ -30,15 +33,22 @@ export default function CreateSessionForm() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [isSaving, setIsSaving] = useState(false)
-  
+
   // Selection
   const [selectedGroupId, setSelectedGroupId] = useState<string>('')
   const [selectedGameId, setSelectedGameId] = useState<string>('')
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('none')
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<string[]>([])
-  
+
   // Scoring
   const [playerScores, setPlayerScores] = useState<Record<string, PlayerScore>>({})
+
+  // Duration tracking
+  const timer = useSessionTimer()
+  const [durationHours, setDurationHours] = useState(0)
+  const [durationMinutes, setDurationMinutes] = useState(0)
+  const [timerDuration, setTimerDuration] = useState<number | null>(null) // set when timer is stopped
+  const [useManualDuration, setUseManualDuration] = useState(false)
   
   // Fetch initial data with SWR - games rarely change so use immutable
   const { data: games = [] } = useImmutableSWR<Game[]>('/api/games')
@@ -54,9 +64,11 @@ export default function CreateSessionForm() {
   )
   
   // Auto-select first template when templates load
-  if (templates.length > 0 && selectedTemplateId === 'none' && selectedGameId) {
-    setSelectedTemplateId(templates[0].id)
-  }
+  useEffect(() => {
+    if (templates.length > 0 && selectedTemplateId === 'none' && selectedGameId) {
+      setSelectedTemplateId(templates[0].id)
+    }
+  }, [templates, selectedGameId, selectedTemplateId])
 
   const handleStartScoring = () => {
     // Initialize scores
@@ -95,15 +107,36 @@ export default function CreateSessionForm() {
     setStep(3)
   }
 
+  const getFinalDuration = (): number | null => {
+    if (timerDuration != null) return timerDuration
+    if (useManualDuration) {
+      const total = durationHours * 60 + durationMinutes
+      return total > 0 ? total : null
+    }
+    return null
+  }
+
+  const handleTimerStop = (minutes: number) => {
+    setTimerDuration(minutes)
+  }
+
   const handleSave = async () => {
     if (isSaving) return
-    
+
+    // If timer is still running, stop it
+    if (timer.isActive && timerDuration == null) {
+      const minutes = timer.stop()
+      setTimerDuration(minutes)
+    }
+
     setIsSaving(true)
+    const finalDuration = getFinalDuration()
     const payload = {
       groupId: selectedGroupId,
       gameId: selectedGameId,
       templateId: selectedTemplateId === 'none' ? null : selectedTemplateId,
       playedAt: new Date().toISOString(),
+      durationMinutes: finalDuration,
       players: Object.values(playerScores)
     }
 
@@ -160,7 +193,7 @@ export default function CreateSessionForm() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 md:px-0">
+    <div className="max-w-2xl mx-auto px-4 md:px-0 pb-16">
       {step === 1 && (
         <Card>
           <CardHeader><CardTitle>Session Setup</CardTitle></CardHeader>
@@ -218,9 +251,62 @@ export default function CreateSessionForm() {
                 </div>
               </div>
             )}
+            {/* Duration tracking */}
+            {selectedGroupId && selectedGameId && selectedPlayerIds.length > 0 && (
+              <div className="border-t pt-4 space-y-3">
+                <Label className="flex items-center gap-2"><Timer className="h-4 w-4" /> Session Timer</Label>
+                {!timer.isActive && !useManualDuration && timerDuration == null && (
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1"
+                      onClick={() => timer.start(selectedGameId, selectedGroupId)}
+                    >
+                      <Timer className="h-4 w-4 mr-2" /> Start Timer
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="flex-1"
+                      onClick={() => setUseManualDuration(true)}
+                    >
+                      <Clock className="h-4 w-4 mr-2" /> Enter Manually
+                    </Button>
+                  </div>
+                )}
+                {timer.isActive && (
+                  <p className="text-sm text-muted-foreground">Timer is running — it will show at the bottom of the screen. You can enter scores while it runs.</p>
+                )}
+                {timerDuration != null && (
+                  <p className="text-sm font-medium">Duration: {formatDurationMinutes(timerDuration)}</p>
+                )}
+                {useManualDuration && (
+                  <div className="flex items-center gap-2">
+                    <Select value={String(durationHours)} onValueChange={(v) => setDurationHours(Number(v))}>
+                      <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {Array.from({ length: 13 }, (_, i) => (
+                          <SelectItem key={i} value={String(i)}>{i}h</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Select value={String(durationMinutes)} onValueChange={(v) => setDurationMinutes(Number(v))}>
+                      <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => (
+                          <SelectItem key={m} value={String(m)}>{m}m</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setUseManualDuration(false)}>Cancel</Button>
+                  </div>
+                )}
+              </div>
+            )}
           </CardContent>
           <CardFooter>
-            <Button 
+            <Button
               disabled={!selectedGroupId || !selectedGameId || selectedPlayerIds.length === 0}
               onClick={handleStartScoring}
             >
@@ -282,7 +368,15 @@ export default function CreateSessionForm() {
 
       {step === 3 && (
         <Card>
-          <CardHeader><CardTitle>Review Results</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle>Review Results</CardTitle>
+            {(timerDuration != null || (useManualDuration && (durationHours > 0 || durationMinutes > 0))) && (
+              <p className="text-sm text-muted-foreground flex items-center gap-1.5">
+                <Clock className="h-3.5 w-3.5" />
+                Duration: {formatDurationMinutes(timerDuration ?? (durationHours * 60 + durationMinutes))}
+              </p>
+            )}
+          </CardHeader>
           <CardContent>
             <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
               <Table className="min-w-[500px]">
@@ -340,6 +434,7 @@ export default function CreateSessionForm() {
           </CardFooter>
         </Card>
       )}
+      <SessionTimerBar onStop={handleTimerStop} />
     </div>
   )
 }

@@ -62,12 +62,15 @@ model CustomScoreTemplate {
 }
 
 model Session {
-  id         String          @id @default(cuid())
-  gameId     String
-  templateId String?
-  groupId    String
-  playedAt   DateTime        @default(now())
-  players    SessionPlayer[]
+  id              String          @id @default(cuid())
+  gameId          String
+  templateId      String?
+  groupId         String
+  playedAt        DateTime        @default(now())
+  durationMinutes Int?
+  startedAt       DateTime?
+  endedAt         DateTime?
+  players         SessionPlayer[]
 
   game     Game                 @relation(fields: [gameId], references: [id])
   template CustomScoreTemplate? @relation(fields: [templateId], references: [id])

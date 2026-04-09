@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { gameId, templateId, groupId, playedAt, players } = body
+    const { gameId, templateId, groupId, playedAt, durationMinutes, players } = body
 
     const newSession = await prisma.session.create({
       data: {
@@ -28,6 +28,7 @@ export async function POST(request: Request) {
         templateId,
         groupId,
         playedAt: new Date(playedAt),
+        durationMinutes: durationMinutes ?? null,
         players: {
           create: players.map((p: PlayerInput) => ({
             userId: p.userId,

@@ -104,7 +104,8 @@ export default async function GroupPage({ params }: { params: Promise<{ groupId:
         id: session.id,
         gameName: session.game.name,
         playedAt: session.playedAt,
-        winnerNames: winners
+        winnerNames: winners,
+        durationMinutes: session.durationMinutes
     }
   })
 

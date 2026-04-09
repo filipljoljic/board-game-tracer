@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { auth } from '@/auth'
 
@@ -59,6 +60,9 @@ export async function POST(request: Request) {
         }
       }
     })
+    revalidateTag('groups')
+    revalidateTag(`user-${session.user.id}-groups`)
+
     return NextResponse.json(group)
   } catch {
     return NextResponse.json({ error: 'Failed to create group' }, { status: 500 })

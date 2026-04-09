@@ -6,6 +6,7 @@ import { AuthProvider } from "@/components/auth-provider";
 import { Toaster } from "sonner";
 import { JsonLd } from "@/components/json-ld";
 import { SWRProvider } from "@/components/swr-provider";
+import { GlobalTimerWrapper } from "@/components/global-timer-wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -188,6 +189,7 @@ export default function RootLayout({
           <SWRProvider>
             <Header />
             {children}
+            <GlobalTimerWrapper />
             <Toaster richColors position="top-right" />
           </SWRProvider>
         </AuthProvider>
