@@ -47,7 +47,11 @@ export default function LeaderboardTable({ data }: { data: LeaderboardEntry[] })
           {data.map((entry, index) => (
             <TableRow key={entry.userId}>
               <TableCell className="font-medium">#{index + 1}</TableCell>
-              <TableCell>{entry.name}</TableCell>
+              <TableCell>
+                <Link href={`/players/${entry.userId}`} className="hover:underline hover:text-primary">
+                  {entry.name}
+                </Link>
+              </TableCell>
               <TableCell className="text-right">{entry.totalLeaguePoints}</TableCell>
               <TableCell className="text-right">{entry.gamesPlayed}</TableCell>
               <TableCell className="text-right">{entry.averagePlacement.toFixed(2)}</TableCell>

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { revalidateTag } from 'next/cache'
 import { prisma } from '@/lib/db'
 import { auth } from '@/auth'
+import { computePlayerStats, computeAchievements, getNewAchievements } from '@/lib/achievements'
 
 interface PlayerInput {
   userId: string
@@ -53,7 +54,48 @@ export async function POST(request: Request) {
     revalidateTag('statistics', 'max')
     revalidateTag(`group-${groupId}-leaderboard`, 'max')
 
-    return NextResponse.json(newSession)
+    // Compute new achievements for the current user
+    const newAchievements: Record<string, { id: string; name: string; description: string; icon: string; tier: string }[]> = {}
+
+    if (players.length >= 2) {
+      // Only compute for the session creator to avoid expensive queries for all players
+      const currentUserId = session.user.id
+      const [allUserSessions, userGroupCount, userData] = await Promise.all([
+        prisma.sessionPlayer.findMany({
+          where: { userId: currentUserId },
+          include: {
+            session: {
+              include: { players: { select: { userId: true, placement: true, rawScore: true } } },
+            },
+          },
+        }),
+        prisma.groupMember.count({ where: { userId: currentUserId } }),
+        prisma.user.findUnique({ where: { id: currentUserId }, select: { seenAchievements: true } }),
+      ])
+
+      const sessions = Array.from(
+        new Map(allUserSessions.map(sp => [sp.session.id, {
+          id: sp.session.id,
+          gameId: sp.session.gameId,
+          playedAt: sp.session.playedAt,
+          durationMinutes: sp.session.durationMinutes,
+          players: sp.session.players,
+        }])).values()
+      )
+
+      const stats = computePlayerStats(currentUserId, sessions, userGroupCount)
+      const achievements = computeAchievements(stats)
+      const seen: string[] = userData?.seenAchievements ? JSON.parse(userData.seenAchievements) : []
+      const freshAchievements = getNewAchievements(achievements, seen)
+
+      if (freshAchievements.length > 0) {
+        newAchievements[currentUserId] = freshAchievements.map(a => ({
+          id: a.id, name: a.name, description: a.description, icon: a.icon, tier: a.tier,
+        }))
+      }
+    }
+
+    return NextResponse.json({ ...newSession, newAchievements })
   } catch {
     return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
   }

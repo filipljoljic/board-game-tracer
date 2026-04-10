@@ -2,12 +2,14 @@
 
 import { useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { LogOut, User, ChevronDown } from 'lucide-react'
 
 export function UserMenu() {
   const { data: session } = useSession()
   const [isOpen, setIsOpen] = useState(false)
+  const router = useRouter()
 
   if (!session?.user) {
     return null
@@ -48,6 +50,7 @@ export function UserMenu() {
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm hover:bg-slate-100 dark:hover:bg-slate-700 rounded-sm"
                 onClick={() => {
                   setIsOpen(false)
+                  router.push(`/players/${session.user.id}`)
                 }}
               >
                 <User className="h-4 w-4" />
