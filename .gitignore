@@ -61,3 +61,6 @@ cursor/
 
 # MCP config (local dev only, contains API keys)
 .mcp.json
+
+# PRD docs (local planning only)
+docs/PRD-*

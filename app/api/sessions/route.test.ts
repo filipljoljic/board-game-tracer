@@ -3,6 +3,9 @@ import { createMockRequest, parseResponse } from '@/tests/helpers/api-helpers'
 
 const mockSessionCreate = vi.fn()
 const mockSessionFindMany = vi.fn()
+const mockSessionPlayerFindMany = vi.fn()
+const mockGroupMemberCount = vi.fn()
+const mockUserFindUnique = vi.fn()
 const mockAuth = vi.fn()
 
 vi.mock('@/lib/db', () => ({
@@ -10,6 +13,15 @@ vi.mock('@/lib/db', () => ({
     session: {
       create: (...args: unknown[]) => mockSessionCreate(...args),
       findMany: (...args: unknown[]) => mockSessionFindMany(...args),
+    },
+    sessionPlayer: {
+      findMany: (...args: unknown[]) => mockSessionPlayerFindMany(...args),
+    },
+    groupMember: {
+      count: (...args: unknown[]) => mockGroupMemberCount(...args),
+    },
+    user: {
+      findUnique: (...args: unknown[]) => mockUserFindUnique(...args),
     },
   },
 }))
@@ -23,6 +35,12 @@ vi.mock('next/cache', () => ({
 }))
 
 import { GET, POST } from './route'
+
+function setupAchievementMocks() {
+  mockSessionPlayerFindMany.mockResolvedValue([])
+  mockGroupMemberCount.mockResolvedValue(1)
+  mockUserFindUnique.mockResolvedValue({ seenAchievements: null })
+}
 
 describe('POST /api/sessions', () => {
   const validPayload = {
@@ -38,6 +56,7 @@ describe('POST /api/sessions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
+    setupAchievementMocks()
   })
 
   it('should return 401 when not authenticated', async () => {
@@ -143,6 +162,7 @@ describe('GET /api/sessions', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockAuth.mockResolvedValue({ user: { id: 'user-1' } })
+    setupAchievementMocks()
   })
 
   it('should return 401 when not authenticated', async () => {
