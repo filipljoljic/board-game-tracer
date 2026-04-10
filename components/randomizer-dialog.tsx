@@ -25,7 +25,7 @@ interface RandomizedPlayer {
   position: number
 }
 
-export function RandomizerDialog() {
+export function RandomizerDialog({ mobile }: { mobile?: boolean } = {}) {
   const [open, setOpen] = React.useState(false)
   const [players, setPlayers] = React.useState<string[]>(['', ''])
   const [randomizedOrder, setRandomizedOrder] = React.useState<RandomizedPlayer[]>([])
@@ -95,10 +95,17 @@ export function RandomizerDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1.5">
-          <Dices className="size-4" />
-          Randomizer
-        </Button>
+        {mobile ? (
+          <button className="hover:text-primary flex items-center gap-2 text-sm font-medium">
+            <Dices className="h-4 w-4" />
+            Randomizer
+          </button>
+        ) : (
+          <Button variant="ghost" size="sm" className="gap-1.5">
+            <Dices className="size-4" />
+            Randomizer
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

@@ -109,9 +109,11 @@ export default function Header() {
                 <BarChart3 className="h-4 w-4" />
                 Statistics
               </Link>
-              <div className="py-2">
-                {mounted && <RandomizerDialog />}
-              </div>
+              {mounted && (
+                <div className="py-2">
+                  <RandomizerDialog mobile />
+                </div>
+              )}
             </nav>
             {session?.user && (
               <div className="pt-2 border-t">
