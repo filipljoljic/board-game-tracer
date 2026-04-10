@@ -148,8 +148,37 @@ export default function CreateSessionForm() {
       })
 
       if (res.ok) {
+        const data = await res.json()
         toast.success('Session saved successfully')
-        router.push(`/groups/${selectedGroupId}`) // Redirect to leaderboard
+
+        // Show achievement toasts
+        if (data.newAchievements) {
+          const allNew = Object.values(data.newAchievements).flat() as { id: string; name: string; description: string }[]
+          for (const achievement of allNew) {
+            setTimeout(() => {
+              toast('Achievement Unlocked!', {
+                description: `${achievement.name} — ${achievement.description}`,
+                duration: 8000,
+                action: {
+                  label: 'View Profile',
+                  onClick: () => router.push(`/players/${Object.keys(data.newAchievements)[0]}`),
+                },
+              })
+            }, 500)
+          }
+
+          // Mark achievements as seen
+          const userId = Object.keys(data.newAchievements)[0]
+          if (userId) {
+            fetch(`/api/players/${userId}/achievements/seen`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ achievementIds: allNew.map(a => a.id) }),
+            }).catch(() => {}) // fire and forget
+          }
+        }
+
+        router.push(`/groups/${selectedGroupId}`)
       } else {
         toast.error('Failed to save session', {
           description: 'Please check your input and try again'

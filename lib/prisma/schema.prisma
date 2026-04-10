@@ -22,6 +22,7 @@ model User {
   emailVerified      DateTime?
   verificationToken  String?         @unique
   verificationExpiry DateTime?
+  seenAchievements   String?
   createdAt          DateTime        @default(now())
   updatedAt          DateTime        @updatedAt
   sessions           SessionPlayer[]
