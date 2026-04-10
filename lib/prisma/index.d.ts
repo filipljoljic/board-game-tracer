@@ -1561,6 +1561,7 @@ export namespace Prisma {
     emailVerified: Date | null
     verificationToken: string | null
     verificationExpiry: Date | null
+    seenAchievements: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1576,6 +1577,7 @@ export namespace Prisma {
     emailVerified: Date | null
     verificationToken: string | null
     verificationExpiry: Date | null
+    seenAchievements: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -1591,6 +1593,7 @@ export namespace Prisma {
     emailVerified: number
     verificationToken: number
     verificationExpiry: number
+    seenAchievements: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -1608,6 +1611,7 @@ export namespace Prisma {
     emailVerified?: true
     verificationToken?: true
     verificationExpiry?: true
+    seenAchievements?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1623,6 +1627,7 @@ export namespace Prisma {
     emailVerified?: true
     verificationToken?: true
     verificationExpiry?: true
+    seenAchievements?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -1638,6 +1643,7 @@ export namespace Prisma {
     emailVerified?: true
     verificationToken?: true
     verificationExpiry?: true
+    seenAchievements?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -1726,6 +1732,7 @@ export namespace Prisma {
     emailVerified: Date | null
     verificationToken: string | null
     verificationExpiry: Date | null
+    seenAchievements: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -1758,6 +1765,7 @@ export namespace Prisma {
     emailVerified?: boolean
     verificationToken?: boolean
     verificationExpiry?: boolean
+    seenAchievements?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
@@ -1776,6 +1784,7 @@ export namespace Prisma {
     emailVerified?: boolean
     verificationToken?: boolean
     verificationExpiry?: boolean
+    seenAchievements?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -1791,6 +1800,7 @@ export namespace Prisma {
     emailVerified?: boolean
     verificationToken?: boolean
     verificationExpiry?: boolean
+    seenAchievements?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
@@ -1819,6 +1829,7 @@ export namespace Prisma {
       emailVerified: Date | null
       verificationToken: string | null
       verificationExpiry: Date | null
+      seenAchievements: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -2226,6 +2237,7 @@ export namespace Prisma {
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly verificationToken: FieldRef<"User", 'String'>
     readonly verificationExpiry: FieldRef<"User", 'DateTime'>
+    readonly seenAchievements: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -8428,6 +8440,7 @@ export namespace Prisma {
     emailVerified: 'emailVerified',
     verificationToken: 'verificationToken',
     verificationExpiry: 'verificationExpiry',
+    seenAchievements: 'seenAchievements',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -8607,6 +8620,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     verificationToken?: StringNullableFilter<"User"> | string | null
     verificationExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
+    seenAchievements?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionPlayerListRelationFilter
@@ -8624,6 +8638,7 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     verificationToken?: SortOrderInput | SortOrder
     verificationExpiry?: SortOrderInput | SortOrder
+    seenAchievements?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     sessions?: SessionPlayerOrderByRelationAggregateInput
@@ -8644,6 +8659,7 @@ export namespace Prisma {
     isAdmin?: BoolFilter<"User"> | boolean
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     verificationExpiry?: DateTimeNullableFilter<"User"> | Date | string | null
+    seenAchievements?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     sessions?: SessionPlayerListRelationFilter
@@ -8661,6 +8677,7 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     verificationToken?: SortOrderInput | SortOrder
     verificationExpiry?: SortOrderInput | SortOrder
+    seenAchievements?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -8682,6 +8699,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     verificationToken?: StringNullableWithAggregatesFilter<"User"> | string | null
     verificationExpiry?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    seenAchievements?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -9040,6 +9058,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerCreateNestedManyWithoutUserInput
@@ -9057,6 +9076,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerUncheckedCreateNestedManyWithoutUserInput
@@ -9074,6 +9094,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUpdateManyWithoutUserNestedInput
@@ -9091,6 +9112,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUncheckedUpdateManyWithoutUserNestedInput
@@ -9108,6 +9130,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -9123,6 +9146,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9138,6 +9162,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -9566,6 +9591,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     verificationToken?: SortOrder
     verificationExpiry?: SortOrder
+    seenAchievements?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9581,6 +9607,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     verificationToken?: SortOrder
     verificationExpiry?: SortOrder
+    seenAchievements?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -9596,6 +9623,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     verificationToken?: SortOrder
     verificationExpiry?: SortOrder
+    seenAchievements?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -10897,6 +10925,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerCreateNestedManyWithoutUserInput
@@ -10913,6 +10942,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     sessions?: SessionPlayerUncheckedCreateNestedManyWithoutUserInput
@@ -10968,6 +10998,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUpdateManyWithoutUserNestedInput
@@ -10984,6 +11015,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     sessions?: SessionPlayerUncheckedUpdateManyWithoutUserNestedInput
@@ -11381,6 +11413,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     groups?: GroupMemberCreateNestedManyWithoutUserInput
@@ -11397,6 +11430,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     verificationToken?: string | null
     verificationExpiry?: Date | string | null
+    seenAchievements?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     groups?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
@@ -11462,6 +11496,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     groups?: GroupMemberUpdateManyWithoutUserNestedInput
@@ -11478,6 +11513,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     verificationToken?: NullableStringFieldUpdateOperationsInput | string | null
     verificationExpiry?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    seenAchievements?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     groups?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
