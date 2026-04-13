@@ -12,21 +12,22 @@ datasource db {
 }
 
 model User {
-  id                 String          @id @default(cuid())
-  username           String          @unique
-  email              String?         @unique
+  id                 String           @id @default(cuid())
+  username           String           @unique
+  email              String?          @unique
   passwordHash       String
   name               String?
-  isGuest            Boolean         @default(false)
-  isAdmin            Boolean         @default(false)
+  isGuest            Boolean          @default(false)
+  isAdmin            Boolean          @default(false)
   emailVerified      DateTime?
-  verificationToken  String?         @unique
+  verificationToken  String?          @unique
   verificationExpiry DateTime?
   seenAchievements   String?
-  createdAt          DateTime        @default(now())
-  updatedAt          DateTime        @updatedAt
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
   sessions           SessionPlayer[]
   groups             GroupMember[]
+  collection         GameCollection[]
 }
 
 model Group {
@@ -47,10 +48,23 @@ model GroupMember {
 }
 
 model Game {
-  id        String                @id @default(cuid())
-  name      String
-  templates CustomScoreTemplate[]
-  sessions  Session[]
+  id         String                @id @default(cuid())
+  name       String
+  templates  CustomScoreTemplate[]
+  sessions   Session[]
+  collection GameCollection[]
+}
+
+model GameCollection {
+  id     String @id @default(cuid())
+  userId String
+  gameId String
+  status String // "OWNED" | "WISHLIST" | "WANT_TO_PLAY"
+
+  user User @relation(fields: [userId], references: [id])
+  game Game @relation(fields: [gameId], references: [id])
+
+  @@unique([userId, gameId])
 }
 
 model CustomScoreTemplate {

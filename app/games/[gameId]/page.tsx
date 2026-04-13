@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { getCachedGame, getGame } from '@/lib/cache'
 import { Plus, Edit } from 'lucide-react'
 import { Metadata } from 'next'
+import { CollectionStatusSelector } from '@/components/collection-status-selector'
 
 /**
  * Dynamic Metadata Generation for Game Detail Pages
@@ -57,12 +58,15 @@ export default async function GameDetailsPage({ params }: { params: Promise<{ ga
         </Link>
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mt-2">
           <h1 className="text-2xl md:text-3xl font-bold">{game.name}</h1>
-          <Link href={`/games/${game.id}/templates/new`} className="w-full md:w-auto">
-            <Button className="w-full md:w-auto">
-              <Plus className="w-4 h-4 mr-2" />
-              New Template
-            </Button>
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <CollectionStatusSelector gameId={game.id} />
+            <Link href={`/games/${game.id}/templates/new`} className="w-full md:w-auto">
+              <Button className="w-full md:w-auto">
+                <Plus className="w-4 h-4 mr-2" />
+                New Template
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
